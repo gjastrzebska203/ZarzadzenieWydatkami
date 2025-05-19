@@ -33,4 +33,9 @@ const validateRegister = [
     }),
 ];
 
-module.exports = { validateRegister };
+const validateLogin = [
+  body('email').isEmail().withMessage('Nieprawidłowy email.'),
+  body('password').notEmpty().withMessage('Hasło jest wymagane.'),
+];
+
+module.exports = { validateRegister, validateLogin };
