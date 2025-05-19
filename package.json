@@ -18,9 +18,12 @@
   "homepage": "https://github.com/gjastrzebska203/ZarzadzenieWydatkami#readme",
   "description": "",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.0",
     "moongoose": "^0.0.1",
+    "prettier": "^3.5.3",
     "sequelize": "^6.37.7"
   }
 }
