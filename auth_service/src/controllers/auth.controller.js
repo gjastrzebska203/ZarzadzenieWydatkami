@@ -2,6 +2,9 @@ const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
+const { v4: uuidv4 } = require('uuid');
+const { sendResetEmail } = require('../utils/mailer');
+const { Op } = require('sequelize');
 
 const registerUser = async (req, res) => {
   const errors = validationResult(req);
@@ -88,8 +91,62 @@ const loginUser = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(400).message({ message: 'Konto nie istnieje.' });
+    }
+
+    const token = uuidv4();
+    const expiry = new Date(Date.now() + 60 * 60 * 1000);
+
+    user.resettoken = token;
+    user.resettokenexpiry = expiry;
+    await user.save();
+
+    await sendResetEmail(user.email, token);
+
+    res.status(200).json({ message: 'Wysłano link resetujący.', token: token });
+  } catch (error) {
+    console.error('forgotPassword:', error.message);
+    res.status(500).json({ message: 'Błąd serwera.' });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({
+      where: {
+        resettoken: token,
+        resettokenexpiry: {
+          [Op.gt]: new Date(),
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Nieprawidłowy lub wygasły token.' });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    user.resettoken = null;
+    user.resettokenexpiry = null;
+    await user.save();
+    return res.status(200).json({ message: 'Hasło zostało zmienione.' });
+  } catch (error) {
+    console.error('resetPassword: ' + error.message);
+    res.status(500).json({ message: 'Błąd serwera.' });
+  }
+};
+
 const getUsers = async (req, res) => {
   return res.status(200).json({ message: 'działa' });
 };
 
-module.exports = { registerUser, loginUser, getUsers };
+module.exports = { registerUser, loginUser, forgotPassword, resetPassword, getUsers };
