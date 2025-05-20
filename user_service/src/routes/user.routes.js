@@ -7,6 +7,7 @@ const {
   getProfile,
   updateProfile,
   changePassword,
+  deleteAccount,
   getUsers,
 } = require('../controllers/user.controller');
 const {
@@ -25,6 +26,7 @@ router.post('/reset-password', resetPassword);
 router.get('/me', authenticate, getProfile);
 router.put('/me', authenticate, updateProfile);
 router.put('/change-password', authenticate, validateChangePassword, changePassword);
+router.delete('/me', authenticate, deleteAccount);
 router.get('/users', getUsers);
 
 module.exports = router;

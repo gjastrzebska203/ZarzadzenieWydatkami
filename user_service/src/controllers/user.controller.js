@@ -192,6 +192,17 @@ const changePassword = async (req, res) => {
   }
 };
 
+const deleteAccount = async (req, res) => {
+  try {
+    await req.user.destroy();
+
+    res.status(200).json({ message: 'Konto zostało usunięte.' });
+  } catch (err) {
+    console.error('Błąd usuwania konta:', err.message);
+    res.status(500).json({ message: 'Nie udało się usunąć konta.' });
+  }
+};
+
 const getUsers = async (req, res) => {
   return res.status(200).json({ message: 'działa' });
 };
@@ -204,5 +215,6 @@ module.exports = {
   getProfile,
   updateProfile,
   changePassword,
+  deleteAccount,
   getUsers,
 };
