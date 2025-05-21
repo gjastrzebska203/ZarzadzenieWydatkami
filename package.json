@@ -29,6 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.0",
     "moongoose": "^0.0.1",
+    "multer": "^2.0.0",
     "nodemailer": "^7.0.3",
     "pg": "^8.16.0",
     "sequelize": "^6.37.7",
