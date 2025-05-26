@@ -1,14 +1,24 @@
 const Expense = require('../models/expense.model');
-const fs = require('fs');
-const path = require('path');
+const { Category } = require('../../../category_service/src/models'); // dostosuj ścieżkę
 
 const createExpense = async (req, res) => {
   try {
-    const { amount, categoryId, date, note, tags } = req.body;
+    const { amount, categoryid, date, note, tags } = req.body;
+
+    if (categoryid) {
+      const category = await Category.findOne({
+        where: { id: categoryid, userid: req.user.id },
+      });
+
+      if (!category) {
+        return res.status(400).json({ message: 'Podana kategoria nie istnieje.' });
+      }
+    }
+
     const expense = new Expense({
       userId: req.user.id,
       amount,
-      categoryId,
+      categoryid,
       date,
       note,
       tags: tags ? tags.split(',') : [],
@@ -48,7 +58,16 @@ const getExpense = async (req, res) => {
 const updateExpense = async (req, res) => {
   try {
     const updates = req.body;
-    // if (req.file) updates.attachment = req.file.path;
+
+    if (updates.category) {
+      const category = await Category.findOne({
+        where: { id: categoryid, userId: req.user.id },
+      });
+
+      if (!category) {
+        return res.status(400).json({ message: 'Podana kategoria nie istnieje.' });
+      }
+    }
 
     const expense = await Expense.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
@@ -57,6 +76,7 @@ const updateExpense = async (req, res) => {
     );
 
     if (!expense) return res.status(404).json({ message: 'Nie znaleziono' });
+
     return res.json(expense);
   } catch (err) {
     return res.status(500).json({ message: 'Błąd aktualizacji wydatku' });

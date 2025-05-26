@@ -1,16 +1,27 @@
 require('dotenv').config();
 const app = require('./app');
-const mongoose = require('./src/config/db');
+const mongoose = require('./src/config/db_mongo');
+const { sequelize, testConnection } = require('./src/config/db_psql');
 
 const PORT = process.env.PORT || 5001;
 
-mongoose.connection.once('open', () => {
-  console.log('MongoDB połączony.');
-  app.listen(PORT, () => {
-    console.log(`Expense Service działa na porcie ${PORT}`);
-  });
-});
+const startServer = async () => {
+  try {
+    await testConnection();
+    await sequelize.sync();
+    mongoose.connection.once('open', () => {
+      app.listen(PORT, () => {
+        console.log(`Expense Service działa na porcie ${PORT}`);
+      });
+    });
+  } catch (err) {
+    console.error('Błąd przy starcie aplikacji:', err);
+    process.exit(1);
+  }
+};
 
-app.listen(PORT, () => {
-  console.log(`Expense Service działa na porcie ${PORT}`);
-});
+startServer();
+
+// app.listen(PORT, () => {
+//   console.log(`Expense Service działa na porcie ${PORT}`);
+// });

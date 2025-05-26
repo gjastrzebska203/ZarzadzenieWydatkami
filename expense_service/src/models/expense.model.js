@@ -10,7 +10,7 @@ const expenseSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    categoryId: {
+    categoryid: {
       type: String,
       required: true,
     },

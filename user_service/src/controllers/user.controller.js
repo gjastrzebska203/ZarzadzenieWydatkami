@@ -68,7 +68,7 @@ const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.tatus(401).json({ message: 'Nieprawidłowy email lub hasło' });
+      return res.status(401).json({ message: 'Nieprawidłowy email lub hasło' });
     }
 
     const token = jwt.sign({ id: user.id, le: user.role }, process.env.JWT_SECRET, {
