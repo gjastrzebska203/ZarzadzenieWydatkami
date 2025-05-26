@@ -10,7 +10,7 @@ const validateExpense = [
       }
       return true;
     }),
-  body('category').isString().withMessage('Błąd kategorii.'),
+  body('categoryId').isString().withMessage('Błąd kategorii.'),
   body('date').optional().isISO8601().toDate().withMessage('Błędna data.'),
   body('note').optional().isString().withMessage('Błąd notatki.'),
   body('tags').optional().isArray().withMessage('Tagi muszą być tablicą.'),

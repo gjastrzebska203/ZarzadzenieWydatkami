@@ -4,11 +4,11 @@ const path = require('path');
 
 const createExpense = async (req, res) => {
   try {
-    const { amount, category, date, note, tags } = req.body;
+    const { amount, categoryId, date, note, tags } = req.body;
     const expense = new Expense({
       userId: req.user.id,
       amount,
-      category,
+      categoryId,
       date,
       note,
       tags: tags ? tags.split(',') : [],
