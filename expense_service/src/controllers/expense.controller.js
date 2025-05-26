@@ -3,11 +3,11 @@ const { Category } = require('../../../category_service/src/models'); // dostosu
 
 const createExpense = async (req, res) => {
   try {
-    const { amount, categoryid, date, note, tags } = req.body;
+    const { amount, categoryId, date, note, tags } = req.body;
 
-    if (categoryid) {
+    if (categoryId) {
       const category = await Category.findOne({
-        where: { id: categoryid, userid: req.user.id },
+        where: { id: categoryId, userid: req.user.id },
       });
 
       if (!category) {
@@ -18,7 +18,7 @@ const createExpense = async (req, res) => {
     const expense = new Expense({
       userId: req.user.id,
       amount,
-      categoryid,
+      categoryId,
       date,
       note,
       tags: tags ? tags.split(',') : [],
@@ -51,7 +51,7 @@ const getExpense = async (req, res) => {
     if (!expense) return res.status(404).json({ message: 'Wydatek nie znaleziony' });
     return res.json(expense);
   } catch (err) {
-    return res.status(500).json({ message: 'Błąd serwera' });
+    return res.status(500).json({ 'Błąd serwera': err.message });
   }
 };
 
@@ -59,9 +59,9 @@ const updateExpense = async (req, res) => {
   try {
     const updates = req.body;
 
-    if (updates.category) {
+    if (updates.categoryId != undefined) {
       const category = await Category.findOne({
-        where: { id: categoryid, userId: req.user.id },
+        where: { id: updates.categoryId, userid: req.user.id },
       });
 
       if (!category) {
@@ -77,9 +77,9 @@ const updateExpense = async (req, res) => {
 
     if (!expense) return res.status(404).json({ message: 'Nie znaleziono' });
 
-    return res.json(expense);
+    return res.status(200).json(expense);
   } catch (err) {
-    return res.status(500).json({ message: 'Błąd aktualizacji wydatku' });
+    return res.status(500).json({ 'Błąd aktualizacji wydatku': err.message });
   }
 };
 
@@ -87,12 +87,6 @@ const deleteExpense = async (req, res) => {
   try {
     const expense = await Expense.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
     if (!expense) return res.status(404).json({ message: 'Nie znaleziono' });
-
-    // if (expense.attachment) {
-    //   fs.unlink(path.resolve(expense.attachment), (err) => {
-    //     if (err) console.warn('Nie udało się usunąć pliku:', err.message);
-    //   });
-    // }
 
     return res.json({ message: 'Usunięto wydatek' });
   } catch (err) {
