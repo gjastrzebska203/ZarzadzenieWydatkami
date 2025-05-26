@@ -9,7 +9,7 @@ module.exports = (sequelize) => {
         defaultValue: UUIDV4,
         primaryKey: true,
       },
-      userId: {
+      userid: {
         type: DataTypes.UUID,
         allowNull: false,
       },
@@ -24,6 +24,15 @@ module.exports = (sequelize) => {
       icon: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      parentcategoryid: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+          model: 'categories',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
       },
       createdat: {
         type: DataTypes.DATE,

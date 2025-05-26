@@ -9,12 +9,13 @@ const createCategory = async (req, res) => {
   }
 
   try {
-    const { name, color, icon } = req.body;
+    const { name, color, icon, parentcategoryid } = req.body;
     const category = await Category.create({
-      userId: req.user.id,
+      userid: req.user.id,
       name,
       color,
       icon,
+      parentcategoryid,
       createdat: new Date(),
       updatedat: new Date(),
     });
@@ -29,7 +30,7 @@ const createCategory = async (req, res) => {
 const getCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({
-      where: { userId: req.user.id },
+      where: { userid: req.user.id },
       order: [['createdat', 'ASC']],
     });
 
@@ -48,7 +49,7 @@ const updateCategory = async (req, res) => {
 
   try {
     const category = await Category.findOne({
-      where: { id: req.params.id, userId: req.user.id },
+      where: { id: req.params.id, iuserId: req.user.id },
     });
 
     if (!category) {
@@ -73,7 +74,7 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
   try {
     const category = await Category.findOne({
-      where: { id: req.params.id, userId: req.user.id },
+      where: { id: req.params.id, userid: req.user.id },
     });
 
     if (!category) {
