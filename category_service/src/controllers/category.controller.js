@@ -49,7 +49,7 @@ const updateCategory = async (req, res) => {
 
   try {
     const category = await Category.findOne({
-      where: { id: req.params.id, iuserId: req.user.id },
+      where: { id: req.params.id, userid: req.user.id },
     });
 
     if (!category) {
