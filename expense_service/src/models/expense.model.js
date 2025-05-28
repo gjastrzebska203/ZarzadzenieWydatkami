@@ -14,6 +14,10 @@ const expenseSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    budgetId: {
+      type: String,
+      default: null,
+    },
     date: {
       type: Date,
       default: Date.now,
@@ -25,9 +29,6 @@ const expenseSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
-    // attachment: {
-    //   type: String,
-    // },
   },
   {
     timestamps: true,

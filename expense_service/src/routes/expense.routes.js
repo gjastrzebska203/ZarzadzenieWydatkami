@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const { authenticate } = require('../middlewares/auth.middleware');
 const {
   createExpense,
   getExpenses,
@@ -7,14 +7,18 @@ const {
   updateExpense,
   deleteExpense,
 } = require('../controllers/expense.controller');
+const {
+  validateCreateExpense,
+  validateUpdateExpense,
+} = require('../middlewares/validate.middleware');
 
-const { authenticate } = require('../middlewares/auth.middleware');
-// const upload = require('../middlewares/upload.middleware');
+const router = express.Router();
+router.use(authenticate);
 
-router.post('/', authenticate, createExpense);
-router.get('/', authenticate, getExpenses);
-router.get('/:id', authenticate, getExpense);
-router.put('/:id', authenticate, updateExpense);
-router.delete('/:id', authenticate, deleteExpense);
+router.post('/', validateCreateExpense, createExpense);
+router.get('/', getExpenses);
+router.get('/:id', getExpense);
+router.put('/:id', validateUpdateExpense, updateExpense);
+router.delete('/:id', deleteExpense);
 
 module.exports = router;

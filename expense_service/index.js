@@ -21,7 +21,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-// app.listen(PORT, () => {
-//   console.log(`Expense Service działa na porcie ${PORT}`);
-// });
