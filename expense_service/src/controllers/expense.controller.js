@@ -63,7 +63,7 @@ const updateExpense = async (req, res) => {
       { new: true }
     );
     if (!expense) return res.status(404).json({ message: 'Nie znaleziono' });
-    return res.status(200).json(expense);
+    return res.status(200).json({ message: 'Zaktualizowano pomyślnie.', expense });
   } catch (error) {
     console.error('Błąd aktualizacji wydatku: ' + error);
     return res.status(500).json({ message: 'Błąd aktualizacji wydatku.' });

@@ -19,7 +19,7 @@ const createCategory = async (req, res) => {
       created_at: new Date(),
       updated_at: new Date(),
     });
-    res.status(201).json({ message: 'Utworzono kategorię.', category: category });
+    return res.status(201).json({ message: 'Utworzono kategorię.', category: category });
   } catch (error) {
     console.error('Błąd tworzenia kategorii: ' + error);
     return res.status(500).json({ message: 'Błąd tworzenia kategorii.' });
@@ -32,7 +32,7 @@ const getCategories = async (req, res) => {
       where: { user_id: req.user.id },
       order: [['created_at', 'ASC']],
     });
-    res.status(200).json({ categories: categories });
+    return res.status(200).json({ categories: categories });
   } catch (error) {
     console.error('Błąd pobierania kategorii: ' + error);
     return res.status(500).json({ message: 'Błąd pobierania kategorii.' });
@@ -59,7 +59,7 @@ const updateCategory = async (req, res) => {
     category.parent_category_id = parent_category_id ?? category.parent_category_id;
     category.updated_at = new Date();
     await category.save();
-    res.status(200).json(category);
+    return res.status(200).json({ message: 'Zaktualizowano pomyślnie.', category });
   } catch (error) {
     console.error('Błąd aktualizacji kategorii: ' + error);
     return res.status(500).json({ message: 'Błąd aktualizacji kategorii.' });
@@ -75,7 +75,7 @@ const deleteCategory = async (req, res) => {
       return res.status(404).json({ message: 'Nie znaleziono kategorii.' });
     }
     await category.destroy();
-    res.status(200).json({ message: 'Kategoria usunięta.' });
+    return res.status(200).json({ message: 'Kategoria usunięta.' });
   } catch (error) {
     console.error('Błąd usuwania kategorii: ' + error);
     return res.status(500).json({ message: 'Błąd usuwania kategorii.' });

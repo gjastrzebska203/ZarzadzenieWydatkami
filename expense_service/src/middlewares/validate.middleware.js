@@ -39,11 +39,8 @@ const validateCreateExpense = [
     }),
 
   body('date').optional().isISO8601().toDate().withMessage('Błędna data.'),
-
   body('note').optional().isString().withMessage('Błąd notatki.'),
-
   body('tags').optional().isArray().withMessage('Tagi muszą być tablicą.'),
-
   body('tags.*').optional().isString().withMessage('Każdy tag musi być tekstem.'),
 ];
 
@@ -83,11 +80,8 @@ const validateUpdateExpense = [
     }),
 
   body('date').optional().isISO8601().toDate().withMessage('Błędna data.'),
-
   body('note').optional().isString().withMessage('Błąd notatki.'),
-
   body('tags').optional().isArray().withMessage('Tagi muszą być tablicą.'),
-
   body('tags.*').optional().isString().withMessage('Każdy tag musi być tekstem.'),
 ];
 

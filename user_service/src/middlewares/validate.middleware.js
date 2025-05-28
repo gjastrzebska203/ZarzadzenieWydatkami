@@ -36,7 +36,6 @@ const validateRegister = [
 
 const validateLogin = [
   body('email').isEmail().withMessage('Nieprawidłowy email.'),
-
   body('password').notEmpty().withMessage('Hasło jest wymagane.'),
 ];
 
