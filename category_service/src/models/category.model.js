@@ -9,7 +9,7 @@ module.exports = (sequelize) => {
         defaultValue: UUIDV4,
         primaryKey: true,
       },
-      userid: {
+      user_id: {
         type: DataTypes.UUID,
         allowNull: false,
       },
@@ -25,7 +25,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      parentcategoryid: {
+      parent_category_id: {
         type: DataTypes.UUID,
         allowNull: true,
         references: {
@@ -34,13 +34,13 @@ module.exports = (sequelize) => {
         },
         onDelete: 'SET NULL',
       },
-      createdat: {
+      created_at: {
         type: DataTypes.DATE,
-        field: 'createdat',
+        field: 'created_at',
       },
-      updatedat: {
+      updated_at: {
         type: DataTypes.DATE,
-        field: 'updatedat',
+        field: 'updated_at',
       },
     },
     {

@@ -9,35 +9,33 @@ const createCategory = async (req, res) => {
   }
 
   try {
-    const { name, color, icon, parentcategoryid } = req.body;
+    const { name, color, icon, parent_category_id } = req.body;
     const category = await Category.create({
-      userid: req.user.id,
+      user_id: req.user.id,
       name,
       color,
       icon,
-      parentcategoryid,
-      createdat: new Date(),
-      updatedat: new Date(),
+      parent_category_id,
+      created_at: new Date(),
+      updated_at: new Date(),
     });
-
     res.status(201).json({ message: 'Utworzono kategorię.', category: category });
-  } catch (err) {
-    console.error('createCategory:', err.message);
-    res.status(500).json({ message: 'Błąd tworzenia kategorii.' });
+  } catch (error) {
+    console.error('Błąd tworzenia kategorii: ' + error);
+    return res.status(500).json({ message: 'Błąd tworzenia kategorii.' });
   }
 };
 
 const getCategories = async (req, res) => {
   try {
     const categories = await Category.findAll({
-      where: { userid: req.user.id },
-      order: [['createdat', 'ASC']],
+      where: { user_id: req.user.id },
+      order: [['created_at', 'ASC']],
     });
-
-    res.json({ categories: categories });
-  } catch (err) {
-    console.error('getCategories:', err.message);
-    res.status(500).json({ message: 'Błąd pobierania kategorii.' });
+    res.status(200).json({ categories: categories });
+  } catch (error) {
+    console.error('Błąd pobierania kategorii: ' + error);
+    return res.status(500).json({ message: 'Błąd pobierania kategorii.' });
   }
 };
 
@@ -49,43 +47,38 @@ const updateCategory = async (req, res) => {
 
   try {
     const category = await Category.findOne({
-      where: { id: req.params.id, userid: req.user.id },
+      where: { id: req.params.id, user_id: req.user.id },
     });
-
     if (!category) {
       return res.status(404).json({ message: 'Nie znaleziono kategorii.' });
     }
-
-    const { name, color, icon } = req.body;
-
+    const { name, color, icon, parent_category_id } = req.body;
     category.name = name ?? category.name;
     category.color = color ?? category.color;
     category.icon = icon ?? category.icon;
-    category.updatedat = new Date();
+    category.parent_category_id = parent_category_id ?? category.parent_category_id;
+    category.updated_at = new Date();
     await category.save();
-
-    res.json(category);
-  } catch (err) {
-    console.error('updateCategory:', err.message);
-    res.status(500).json({ message: 'Błąd aktualizacji kategorii.' });
+    res.status(200).json(category);
+  } catch (error) {
+    console.error('Błąd aktualizacji kategorii: ' + error);
+    return res.status(500).json({ message: 'Błąd aktualizacji kategorii.' });
   }
 };
 
 const deleteCategory = async (req, res) => {
   try {
     const category = await Category.findOne({
-      where: { id: req.params.id, userid: req.user.id },
+      where: { id: req.params.id, user_id: req.user.id },
     });
-
     if (!category) {
       return res.status(404).json({ message: 'Nie znaleziono kategorii.' });
     }
-
     await category.destroy();
-    res.json({ message: 'Kategoria usunięta.' });
-  } catch (err) {
-    console.error('deleteCategory:', err.message);
-    res.status(500).json({ message: 'Błąd usuwania kategorii' });
+    res.status(200).json({ message: 'Kategoria usunięta.' });
+  } catch (error) {
+    console.error('Błąd usuwania kategorii: ' + error);
+    return res.status(500).json({ message: 'Błąd usuwania kategorii.' });
   }
 };
 

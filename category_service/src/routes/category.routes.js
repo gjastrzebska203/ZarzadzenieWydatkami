@@ -1,4 +1,5 @@
 const express = require('express');
+const { authenticate } = require('../middlewares/auth.middleware');
 const {
   createCategory,
   getCategories,
@@ -9,10 +10,8 @@ const {
   validateCreateCategory,
   validateUpdateCategory,
 } = require('../middlewares/validate.middleware');
-const { authenticate } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
-
 router.use(authenticate);
 
 router.post('/', validateCreateCategory, createCategory);

@@ -9,7 +9,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
 const testConnection = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Połączenie z bazą danych zostało nawiązane poprawnie.');
+    console.log('Połączono z bazą danych SQL.');
   } catch (error) {
     console.error('Nie udało się połączyć z bazą danych:', error.message);
     process.exit(1);
