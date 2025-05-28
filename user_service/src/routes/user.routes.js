@@ -1,4 +1,5 @@
 const express = require('express');
+const { authenticate } = require('../middlewares/auth.middleware');
 const {
   registerUser,
   loginUser,
@@ -15,7 +16,6 @@ const {
   validateChangePassword,
   validateUpdateProfile,
 } = require('../middlewares/validate.middleware');
-const { authenticate } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
