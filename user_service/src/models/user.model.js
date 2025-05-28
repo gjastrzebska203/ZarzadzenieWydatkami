@@ -21,7 +21,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      fullname: {
+      full_name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -38,25 +38,25 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         defaultValue: 'PLN',
       },
-      isemailverified: {
+      is_email_verified: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
-      resettoken: {
+      reset_token: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      resettokenexpiry: {
+      reset_token_expiry: {
         type: DataTypes.DATE,
         allowNull: true,
       },
-      createdat: {
+      created_at: {
         type: DataTypes.DATE,
-        field: 'createdat',
+        field: 'created_at',
       },
-      updatedat: {
+      updated_at: {
         type: DataTypes.DATE,
-        field: 'updatedat',
+        field: 'updated_at',
       },
     },
     {

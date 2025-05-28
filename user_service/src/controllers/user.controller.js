@@ -12,41 +12,33 @@ const registerUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, password, fullname, language, currency } = req.body;
+  const { email, password, full_name, language, currency } = req.body;
 
   try {
-    const existsingUser = await User.findOne({ where: { email } });
-    if (existsingUser) {
-      return res.status(400).json({ message: 'Email jest już zajęty.' });
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await User.create({
       email,
       password: hashedPassword,
-      fullname,
+      full_name,
       language,
       currency,
     });
-
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '5h',
     });
-
     return res.status(201).json({
       message: 'Utworzono konto.',
       token,
       user: {
         id: user.id,
         email: user.email,
-        fullname: user.fullname,
+        full_name: user.full_name,
         role: user.role,
       },
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Błąd serwera.' });
+    console.error('Błąd rejestracji: ' + error);
+    return res.status(500).json({ message: 'Błąd rejestracji.' });
   }
 };
 
@@ -81,13 +73,13 @@ const loginUser = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        fullname: user.fullname,
+        full_name: user.full_name,
         role: user.role,
       },
     });
   } catch (error) {
-    console.error('Błąd logowania:', error.message);
-    res.status(500).json({ message: 'Błąd serwera' });
+    console.error('Błąd logowania: ' + error);
+    return res.status(500).json({ message: 'Błąd logowania.' });
   }
 };
 
@@ -99,20 +91,16 @@ const forgotPassword = async (req, res) => {
     if (!user) {
       return res.status(400).message({ message: 'Konto nie istnieje.' });
     }
-
     const token = uuidv4();
     const expiry = new Date(Date.now() + 60 * 60 * 1000);
-
-    user.resettoken = token;
-    user.resettokenexpiry = expiry;
+    user.reset_token = token;
+    user.reset_token_expiry = expiry;
     await user.save();
-
     await sendResetEmail(user.email, token);
-
     res.status(200).json({ message: 'Wysłano link resetujący.', token: token });
   } catch (error) {
-    console.error('forgotPassword:', error.message);
-    res.status(500).json({ message: 'Błąd serwera.' });
+    console.error('Błąd forgotPassword: ' + error);
+    return res.status(500).json({ message: 'Błąd forgotPassword.' });
   }
 };
 
@@ -122,51 +110,49 @@ const resetPassword = async (req, res) => {
   try {
     const user = await User.findOne({
       where: {
-        resettoken: token,
-        resettokenexpiry: {
+        reset_token: token,
+        reset_token_expiry: {
           [Op.gt]: new Date(),
         },
       },
     });
-
     if (!user) {
       return res.status(400).json({ message: 'Nieprawidłowy lub wygasły token.' });
     }
-
     const hashed = await bcrypt.hash(newPassword, 10);
     user.password = hashed;
-    user.resettoken = null;
-    user.resettokenexpiry = null;
+    user.reset_token = null;
+    user.reset_tokenexpiry = null;
     await user.save();
     return res.status(200).json({ message: 'Hasło zostało zmienione.' });
   } catch (error) {
-    console.error('resetPassword: ' + error.message);
-    res.status(500).json({ message: 'Błąd serwera.' });
+    console.error('Błąd resetPassword: ' + error);
+    return res.status(500).json({ message: 'Błąd resetPassword.' });
   }
 };
 
 const getProfile = async (req, res) => {
-  const { id, email, fullname, role, language, currency } = req.user;
-  res.status(200).json({ id, email, fullname, role, language, currency });
+  const { id, email, full_name, role, language, currency } = req.user;
+  res.status(200).json({ id, email, full_name, role, language, currency });
 };
 
 const updateProfile = async (req, res) => {
-  const { email, fullname, language, currency } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email, full_name, language, currency } = req.body;
   try {
-    const existingUser = await User.findOne({ where: { email } });
-    if (email && existingUser && existingUser.id !== req.user.id) {
-      return res.status(400).json({ message: 'Podany email jest już zajęty. Podaj inne dane.' });
-    } else {
-      req.user.email = email || req.user.email;
-      req.user.fullname = fullname || req.user.fullname;
-      req.user.language = language || req.user.language;
-      req.user.currency = currency || req.user.currency;
-      await req.user.save();
-      res.status(200).json({ message: 'Zaktualizowano pomyślnie.', user: req.user });
-    }
+    req.user.email = email || req.user.email;
+    req.user.full_name = full_name || req.user.full_name;
+    req.user.language = language || req.user.language;
+    req.user.currency = currency || req.user.currency;
+    await req.user.save();
+    res.status(200).json({ message: 'Zaktualizowano pomyślnie.', user: req.user });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Błąd serwera.' });
+    console.error('Błąd aktualizacji profilu: ' + error);
+    return res.status(500).json({ message: 'Błąd aktualizacji profilu.' });
   }
 };
 
@@ -175,36 +161,30 @@ const changePassword = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+
   const { currentPassword, newPassword } = req.body;
 
   try {
     const isMatch = await bcrypt.compare(currentPassword, req.user.password);
     if (!isMatch) return res.status(400).json({ message: 'Nieprawidłowe obecne hasło' });
-
     const hashed = await bcrypt.hash(newPassword, 10);
     req.user.password = hashed;
     await req.user.save();
-
     res.json({ message: 'Hasło zmienione' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Błąd zmiany hasła.' });
+    console.error('Błąd zmiany hasła: ' + error);
+    return res.status(500).json({ message: 'Błąd zmiany hasła.' });
   }
 };
 
 const deleteAccount = async (req, res) => {
   try {
     await req.user.destroy();
-
     res.status(200).json({ message: 'Konto zostało usunięte.' });
-  } catch (err) {
-    console.error('Błąd usuwania konta:', err.message);
-    res.status(500).json({ message: 'Nie udało się usunąć konta.' });
+  } catch (error) {
+    console.error('Błąd usuwania konta: ' + error);
+    return res.status(500).json({ message: 'Błąd usuwania konta.' });
   }
-};
-
-const getUsers = async (req, res) => {
-  return res.status(200).json({ message: 'działa' });
 };
 
 module.exports = {
@@ -216,5 +196,4 @@ module.exports = {
   updateProfile,
   changePassword,
   deleteAccount,
-  getUsers,
 };

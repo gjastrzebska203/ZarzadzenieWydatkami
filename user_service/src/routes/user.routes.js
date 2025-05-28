@@ -8,12 +8,12 @@ const {
   updateProfile,
   changePassword,
   deleteAccount,
-  getUsers,
 } = require('../controllers/user.controller');
 const {
   validateRegister,
   validateLogin,
   validateChangePassword,
+  validateUpdateProfile,
 } = require('../middlewares/validate.middleware');
 const { authenticate } = require('../middlewares/auth.middleware');
 
@@ -24,9 +24,8 @@ router.post('/login', validateLogin, loginUser);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.get('/me', authenticate, getProfile);
-router.put('/me', authenticate, updateProfile);
+router.put('/me', authenticate, validateUpdateProfile, updateProfile);
 router.put('/change-password', authenticate, validateChangePassword, changePassword);
 router.delete('/me', authenticate, deleteAccount);
-router.get('/users', getUsers);
 
 module.exports = router;
