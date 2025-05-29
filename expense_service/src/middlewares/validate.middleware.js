@@ -17,7 +17,7 @@ const validateCreateExpense = [
     .isString()
     .custom(async (val) => {
       const category = await Category.findOne({
-        where: { id: val, userid: req.user.id },
+        where: { id: val },
       });
       if (!category) {
         throw new Error('Brak kategorii w bazie.');

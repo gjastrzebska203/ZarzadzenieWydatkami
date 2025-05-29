@@ -59,7 +59,7 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Nieprawidłowy email lub hasło' });
     }
     const token = jwt.sign({ id: user.id, le: user.role }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '5h',
     });
     res.status(200).json({
       message: 'Zalogowano pomyślnie.',

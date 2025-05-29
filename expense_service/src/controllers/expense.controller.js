@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const Expense = require('../models/expense.model');
 
 const createExpense = async (req, res) => {
@@ -15,7 +16,7 @@ const createExpense = async (req, res) => {
       budgetId,
       date,
       note,
-      tags: tags ? tags.split(',') : [],
+      tags: tags ? tags : [],
     });
     await expense.save();
     return res.status(201).json({ expense });

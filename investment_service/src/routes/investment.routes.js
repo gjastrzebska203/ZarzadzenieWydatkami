@@ -1,6 +1,5 @@
 const express = require('express');
 const { authenticate } = require('../middlewares/auth.middleware');
-const router = express.Router();
 const {
   createInvestment,
   getInvestments,
@@ -13,6 +12,8 @@ const {
   validateCreateInvestment,
   validateUpdateInvestment,
 } = require('../middlewares/validate.middleware.js');
+
+const router = express.Router();
 router.use(authenticate);
 
 router.post('/', validateCreateInvestment, createInvestment);
