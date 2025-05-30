@@ -8,12 +8,13 @@ const createExpense = async (req, res) => {
   }
 
   try {
-    const { amount, categoryId, budgetId, date, note, tags } = req.body;
+    const { amount, categoryId, budgetId, accountId, date, note, tags } = req.body;
     const expense = new Expense({
       userId: req.user.id,
       amount,
       categoryId,
       budgetId,
+      accountId,
       date,
       note,
       tags: tags ? tags : [],

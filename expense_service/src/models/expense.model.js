@@ -18,6 +18,10 @@ const expenseSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    accountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
     date: {
       type: Date,
       default: Date.now,
