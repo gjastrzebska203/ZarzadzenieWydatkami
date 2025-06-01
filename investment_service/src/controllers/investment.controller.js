@@ -79,13 +79,8 @@ const updateInvestment = async (req, res) => {
     investment.currentAmount = currentAmount ?? investment.currentAmount;
     investment.interestRate = interestRate ?? investment.interestRate;
     investment.targetDate = targetDate ?? investment.targetDate;
-    const updated = await Investment.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
-      req.body,
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ message: 'Nie znaleziono celu.' });
-    return res.status(200).json(updated);
+    await investment.save();
+    return res.status(200).json({ message: 'Zaktualizowano cel', investment });
   } catch (error) {
     console.error('Błąd aktualizacji celu: ' + error);
     return res.status(500).json({ message: 'Błąd aktualizacji celu.' });
