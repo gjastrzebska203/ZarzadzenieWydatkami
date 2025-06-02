@@ -8,9 +8,9 @@ const createNotification = async (req, res) => {
   }
 
   try {
-    const { type, title, message } = req.body;
+    const { userId, type, title, message } = req.body;
     const notification = await Notification.create({
-      userId: req.user.id,
+      userId: userId || req.user.id,
       type,
       title,
       message,

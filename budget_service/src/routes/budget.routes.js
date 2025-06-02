@@ -6,6 +6,7 @@ const {
   getBudget,
   updateBudget,
   addLimit,
+  checkBudgetLimits,
   deleteBudget,
   deleteLimit,
 } = require('../controllers/budget.controller');
@@ -23,6 +24,7 @@ router.get('/', getBudgets);
 router.get('/:id', getBudget);
 router.put('/:id', validateUpdateBudget, updateBudget);
 router.put('/:id/limits', validateAddLimit, addLimit);
+router.put('/:id/check-limits', checkBudgetLimits);
 router.delete('/:id', deleteBudget);
 router.delete('/:id/limits/:category', deleteLimit);
 

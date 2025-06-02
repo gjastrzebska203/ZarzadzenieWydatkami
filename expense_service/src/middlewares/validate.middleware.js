@@ -1,6 +1,6 @@
 const { body } = require('express-validator');
 const { Category } = require('../../../category_service/src/models');
-const { Budget } = require('../../../budget_service/src/models/budget.model');
+const Budget = require('../../../budget_service/src/models/budget.model');
 const { Account } = require('../../../account_service/src/models/account.model');
 
 const validateCreateExpense = [
@@ -30,9 +30,7 @@ const validateCreateExpense = [
   body('budgetId')
     .optional()
     .custom(async (val) => {
-      const budget = await Budget.findOne({
-        where: { id: val },
-      });
+      const budget = await Budget.findById(val);
       if (!budget) {
         throw new Error('Brak budżetu.');
       }
@@ -83,9 +81,7 @@ const validateUpdateExpense = [
   body('budgetId')
     .optional()
     .custom(async (val) => {
-      const budget = await Budget.findOne({
-        where: { id: val },
-      });
+      const budget = await Budget.findById(val);
       if (!budget) {
         throw new Error('Brak budżetu.');
       }

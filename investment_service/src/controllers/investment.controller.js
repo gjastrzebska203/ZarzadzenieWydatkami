@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const Investment = require('../models/investment.model');
-const { simulateGrowth, yearsBetweenDates } = require('../../utils/simulation.utils.js');
+const { simulateGrowth, yearsBetweenDates } = require('../utils/simulation.utils.js');
 
 const createInvestment = async (req, res) => {
   const errors = validationResult(req);

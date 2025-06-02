@@ -1,5 +1,8 @@
 const Budget = require('../models/budget.model');
+const Expense = require('../../../expense_service/src/models/expense.model');
+const { Category } = require('../../../category_service/src/models');
 const { validationResult } = require('express-validator');
+const notifyUser = require('../utils/notifyUser');
 
 const createBudget = async (req, res) => {
   const errors = validationResult(req);
@@ -59,7 +62,9 @@ const getBudget = async (req, res) => {
     if (!budget) {
       return res.status(400).json({ message: 'Brak budżetu.' });
     }
-    return res.status(200).json({ budget });
+
+    const expenses = await Expense.find({ budgetId: req.params.id });
+    return res.status(200).json({ message: 'Znaleziono budżet', budget, expenses });
   } catch (error) {
     console.error('Błąd pobierania budżetu: ' + error);
     return res.status(500).json({ message: 'Błąd pobierania budżetu.' });
@@ -93,6 +98,56 @@ const updateBudget = async (req, res) => {
   } catch (error) {
     console.error('Błąd aktualizacji budżetu: ' + error);
     return res.status(500).json({ message: 'Błąd aktualizacji budżetu.' });
+  }
+};
+
+const checkBudgetLimits = async (req, res) => {
+  try {
+    const budget = await Budget.findOne({ _id: req.params.id, userId: req.user.id });
+    if (!budget) return res.status(404).json({ message: 'Nie znaleziono budżetu' });
+
+    const expenses = await Expense.find({
+      userId: req.user.id,
+      budgetId: req.params.id,
+      date: { $gte: budget.startDate, $lte: budget.endDate },
+    });
+    if (expenses.length === 0) return null;
+
+    const totals = expenses.reduce((acc, { categoryId, amount }) => {
+      acc[categoryId] = (acc[categoryId] || 0) + amount;
+      return acc;
+    }, {});
+
+    const totalsByCategory = Object.entries(totals).map(([category, total]) => ({
+      category,
+      total,
+    }));
+
+    let overLimit = false;
+    await Promise.all(
+      totalsByCategory.map(async (curr) => {
+        const limit = budget.limits.find((el) => el.category === curr.category);
+        if (limit && curr.total > limit.amount) {
+          overLimit = true;
+          await notifyUser({
+            token: req.headers.authorization?.split(' ')[1],
+            title: 'Przekroczono limit budżetu',
+            message: `Przekroczono limit kategorii "${curr.category}" w budżecie nr ${budget._id}`,
+          });
+        }
+      })
+    );
+
+    if (overLimit === true) {
+      return res.status(200).json({ message: 'Przekroczono limit, wysłano powiadomienie.' });
+    } else if (overLimit === false) {
+      return res.status(200).json({ message: 'Nie przekroczono limitu.' });
+    }
+  } catch (error) {
+    console.error('Błąd wysłania powiadomienia o przekroczeniu budżetu: ' + error);
+    return res
+      .status(500)
+      .json({ message: 'Błąd wysłania powiadomienia o przekroczeniu budżetu:.' });
   }
 };
 
@@ -156,6 +211,7 @@ module.exports = {
   getBudget,
   updateBudget,
   addLimit,
+  checkBudgetLimits,
   deleteLimit,
   deleteBudget,
 };
