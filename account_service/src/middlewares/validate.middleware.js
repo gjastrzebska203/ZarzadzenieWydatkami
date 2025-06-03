@@ -12,7 +12,6 @@ const validateCreateAccount = [
     .withMessage('Dozwolone wartości to "cash", "card", "bank", "e-wallet".'),
 
   body('currency')
-    .optional()
     .isString()
     .custom((val) => {
       if (!currencyCodes.includes(val.toUpperCase())) {

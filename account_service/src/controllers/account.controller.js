@@ -1,10 +1,13 @@
 const { validationResult } = require('express-validator');
 const Account = require('../models/account.model');
 
-const createAccount = async (req, res) => {
+const createAccount = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
   try {
@@ -18,43 +21,55 @@ const createAccount = async (req, res) => {
       isActive,
     });
     return res.status(201).json({ message: 'Utworzono rachunek.', account });
-  } catch (error) {
-    console.error('Błąd tworzenia rachunku: ' + error);
-    return res.status(500).json({ message: 'Błąd tworzenia rachunku.' });
+  } catch (err) {
+    const error = new Error('Błąd tworzenia rachunku: ');
+    error.details = err.message;
+    next(error);
   }
 };
 
-const getAccounts = async (req, res) => {
+const getAccounts = async (req, res, next) => {
   try {
     const accounts = await Account.find({ userId: req.user.id });
     return res.status(200).json({ message: 'Znaleziono rachunki.', accounts });
-  } catch (error) {
-    console.error('Błąd pobierania rachunków: ' + error);
-    return res.status(500).json({ message: 'Błąd pobierania rachunków.' });
+  } catch (err) {
+    const error = new Error('Błąd pobierania rachunków');
+    error.details = err.message;
+    next(error);
   }
 };
 
-const getAccount = async (req, res) => {
+const getAccount = async (req, res, next) => {
   try {
     const account = await Account.findOne({ _id: req.params.id, userId: req.user.id });
-    if (!account) return res.status(404).json({ message: 'Nie znaleziono rachunku' });
+    if (!account) {
+      const error = new Error('Nie znaleziono rachunku');
+      error.status = 404;
+      return next(error);
+    }
     return res.status(200).json({ message: 'Znaleziono rachunek.', account });
-  } catch (error) {
-    console.error('Błąd pobierania rachunku: ' + error);
-    return res.status(500).json({ message: 'Błąd pobierania rachunku.' });
+  } catch (err) {
+    const error = new Error('Błąd pobierania rachunku');
+    error.details = err.message;
+    next(error);
   }
 };
 
-const updateAccount = async (req, res) => {
+const updateAccount = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
   try {
     const account = await Account.findOne({ _id: req.params.id, userId: req.user.id });
     if (!account) {
-      return res.status(404).json({ message: 'Rachunek nie znaleziony.' });
+      const error = new Error('Nie znaleziono rachunku');
+      error.status = 404;
+      return next(error);
     }
     const { name, type, currency, balance, isActive } = req.body;
     account.name = name ?? account.name;
@@ -64,33 +79,40 @@ const updateAccount = async (req, res) => {
     account.isActive = isActive ?? account.isActive;
     await account.save();
     res.status(200).json({ message: 'Zaktualizowano pomyślnie.', account });
-  } catch (error) {
-    console.error('Błąd aktualizacji rachunku: ' + error);
-    return res.status(500).json({ message: 'Błąd aktualizacji rachunku.' });
+  } catch (err) {
+    const error = new Error('Błąd aktualizacji rachunku');
+    error.details = err.message;
+    next(error);
   }
 };
 
-const deleteAccount = async (req, res) => {
+const deleteAccount = async (req, res, next) => {
   try {
     const account = await Account.findOne({
       _id: req.params.id,
       userId: req.user.id,
     });
     if (!account) {
-      return res.status(404).json({ message: 'Rachunek nie znaleziony' });
+      const error = new Error('Nie znaleziono rachunku');
+      error.status = 404;
+      return next(error);
     }
     await account.deleteOne();
     return res.status(200).json({ message: 'Rachunek usunięty' });
-  } catch (error) {
-    console.error('Błąd usuwania rachunku: ' + error);
-    return res.status(500).json({ message: 'Błąd usuwania rachunku.' });
+  } catch (err) {
+    const error = new Error('Błąd usuwania rachunku');
+    error.details = err.message;
+    next(error);
   }
 };
 
-const transferFunds = async (req, res) => {
+const transferFunds = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
   try {
@@ -98,8 +120,11 @@ const transferFunds = async (req, res) => {
     const from = await Account.findOne({ _id: fromAccountId, userId: req.user.id });
     const to = await Account.findOne({ _id: toAccountId, userId: req.user.id });
 
-    if (from.balance < amount)
-      return res.status(400).json({ message: 'Brak środków na koncie źródłowym' });
+    if (from.balance < amount) {
+      const error = new Error('Brak środków na koncie źródłowym');
+      error.status = 404;
+      return next(error);
+    }
 
     from.balance -= amount;
     to.balance += amount;
@@ -108,9 +133,10 @@ const transferFunds = async (req, res) => {
     await to.save();
 
     res.status(200).json({ message: 'Transfer zakończony sukcesem', from, to });
-  } catch (error) {
-    console.error('Błąd usuwania rachunku: ' + error);
-    return res.status(500).json({ message: 'Błąd usuwania rachunku.' });
+  } catch (err) {
+    const error = new Error('Błąd transferu środków');
+    error.details = err.message;
+    next(error);
   }
 };
 
