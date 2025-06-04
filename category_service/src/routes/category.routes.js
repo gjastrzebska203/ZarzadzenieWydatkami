@@ -3,6 +3,7 @@ const { authenticate } = require('../middlewares/auth.middleware');
 const {
   createCategory,
   getCategories,
+  getCategoryById,
   updateCategory,
   deleteCategory,
 } = require('../controllers/category.controller');
@@ -16,6 +17,7 @@ router.use(authenticate);
 
 router.post('/', validateCreateCategory, createCategory);
 router.get('/', getCategories);
+router.get('/:id', getCategoryById);
 router.put('/:id', validateUpdateCategory, updateCategory);
 router.delete('/:id', deleteCategory);
 
