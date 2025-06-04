@@ -1,6 +1,5 @@
 require('dotenv').config();
 const app = require('./app');
-require('./src/cron/savingSuggestions');
 const mongoose = require('./src/config/db_mongo');
 const { sequelize, testConnection } = require('./src/config/db_psql');
 

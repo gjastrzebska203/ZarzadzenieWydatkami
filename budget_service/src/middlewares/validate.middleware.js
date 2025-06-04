@@ -1,5 +1,4 @@
 const { body } = require('express-validator');
-const { Category } = require('../../../category_service/src/models');
 
 const validateCreateBudget = [
   body('limits').custom(async (val) => {
@@ -23,11 +22,17 @@ const validateCreateBudget = [
       ) {
         throw new Error('Nieprawidłowe typy danych w limits.');
       }
-      const category_db = await Category.findOne({
-        where: {
-          id: item.category,
-        },
-      });
+
+      const categories_req = await axios.get(
+        `${process.env.CATEGORY_SERVICE_URL}/api/category/${item.category}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const category_db = categories_req.data.category;
+
       if (!category_db) {
         throw new Error('Kategoria nie istnieje.');
       }
@@ -67,11 +72,15 @@ const validateUpdateBudget = [
         ) {
           throw new Error('Nieprawidłowe typy danych w limits.');
         }
-        const category_db = await Category.findOne({
-          where: {
-            id: item.category,
-          },
-        });
+        const categories_req = await axios.get(
+          `${process.env.CATEGORY_SERVICE_URL}/api/category/${item.category}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const category_db = categories_req.data.category;
         if (!category_db) {
           throw new Error('Kategoria nie istnieje.');
         }
@@ -93,11 +102,16 @@ const validateAddLimit = [
       throw new Error('limits musi być tablicą.');
     }
 
-    const categories_db = await Category.findAll({
-      where: {
-        user_id: req.user.id,
-      },
-    });
+    const categories_req = await axios.get(
+      `${process.env.CATEGORY_SERVICE_URL}/api/category/${item.category}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const categories_db = categories_req.data.category;
+
     const categories = val.map((item) => item.category).push(categories_db);
     const uniqueCategories = new Set(categories);
     if (uniqueCategories.size !== categories.length) {
@@ -118,11 +132,15 @@ const validateAddLimit = [
       ) {
         throw new Error('Nieprawidłowe typy danych w limits.');
       }
-      const category_db = await Category.findOne({
-        where: {
-          id: item.category,
-        },
-      });
+      const categories_req = await axios.get(
+        `${process.env.CATEGORY_SERVICE_URL}/api/category/${item.category}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const category_db = categories_req.data.category;
       if (!category_db) {
         throw new Error('Kategoria nie istnieje.');
       }
