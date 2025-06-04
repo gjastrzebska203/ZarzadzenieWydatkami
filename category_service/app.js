@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-
 const categoryRoutes = require('./src/routes/category.routes');
+const errorHandler = require('./src/middlewares/errorHandler');
 
 const app = express();
 
@@ -11,10 +11,6 @@ app.use(helmet());
 app.use(express.json());
 
 app.use('/api/category', categoryRoutes);
-
-app.get('/', (req, res) => {
-  console.log('Category Service działa!');
-  res.send('Category Service działa!');
-});
+app.use(errorHandler);
 
 module.exports = app;
