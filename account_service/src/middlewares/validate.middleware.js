@@ -52,10 +52,11 @@ const validateUpdateAccount = [
 const validateTransferFunds = [
   body('fromAccountId')
     .custom(async (val) => {
-      if (!mongoose.Types.ObjectId.isValid(val)) {
-        throw new Error('Nieprawidłowy format ID konta.');
-      }
-      const account = await Account.findById(val);
+      // if (!mongoose.Types.ObjectId.isValid(val)) {
+      //   throw new Error('Nieprawidłowy format ID konta.');
+      // }
+      console.log(val);
+      const account = await Account.findOne({ _id: val });
       if (!account) {
         throw new Error('Konto docelowe nie istnieje.');
       }
@@ -65,10 +66,10 @@ const validateTransferFunds = [
 
   body('toAccountId')
     .custom(async (val) => {
-      if (!mongoose.Types.ObjectId.isValid(val)) {
-        throw new Error('Nieprawidłowy format ID konta.');
-      }
-      const account = await Account.findById(val);
+      // if (!mongoose.Types.ObjectId.isValid(val)) {
+      //   throw new Error('Nieprawidłowy format ID konta.');
+      // }
+      const account = await Account.findOne({ _id: val });
       if (!account) {
         throw new Error('Konto docelowe nie istnieje.');
       }
