@@ -4,7 +4,10 @@ const Expense = require('../models/expense.model');
 const createExpense = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
   try {
@@ -20,23 +23,30 @@ const createExpense = async (req, res) => {
       tags: tags ? tags : [],
     });
     await expense.save();
-    return res.status(201).json({ expense });
-  } catch (error) {
-    console.error('Błąd tworzenia wydatku: ' + error);
-    return res.status(500).json({ message: 'Błąd tworzenia wydatku.' });
+    return res.status(201).json({ message: 'Utworzono wydatek.', expense });
+  } catch (err) {
+    const error = new Error('Błąd tworzenia wydatku');
+    error.details = err.message;
+    next(error);
   }
 };
 
 const getExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find({ userId: req.user.id }).sort({ date: -1 });
-    if (expenses.length === 0) {
-      return res.status(200).json({ message: 'Brak wydatków.' });
-    }
-    return res.status(200).json({ expenses });
-  } catch (error) {
-    console.error('Błąd pobierania wydatków: ' + error);
-    return res.status(500).json({ message: 'Błąd pobierania wydatków.' });
+    const { budgetId, from, to } = req.query;
+    const query = {
+      userId: req.user.id,
+    };
+
+    if (budgetId) query.budgetId = budgetId;
+    if (from && to) query.date = { $gte: new Date(from), $lte: new Date(to) };
+
+    const expenses = await Expense.find(query).sort({ date: -1 });
+    return res.status(200).json({ message: 'Znaleziono wydatki', expenses });
+  } catch (err) {
+    const error = new Error('Błąd pobierania wydatków');
+    error.details = err.message;
+    next(error);
   }
 };
 
@@ -44,17 +54,75 @@ const getExpense = async (req, res) => {
   try {
     const expense = await Expense.findOne({ _id: req.params.id, userId: req.user.id });
     if (!expense) return res.status(404).json({ message: 'Wydatek nie znaleziony' });
-    return res.status(200).json(expense);
-  } catch (error) {
-    console.error('Błąd pobierania wydatku: ' + error);
-    return res.status(500).json({ message: 'Błąd pobierania wydatku.' });
+    return res.status(200).json({ message: 'Znaleziono wydatek', expense });
+  } catch (err) {
+    const error = new Error('Błąd pobierania wydatku');
+    error.details = err.message;
+    next(error);
+  }
+};
+
+const checkForUnusualExpenses = async (req, res, next) => {
+  try {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const recentExpenses = await Expense.find({
+      date: { $gte: yesterday, $lt: today },
+    });
+
+    await Promise.all(
+      Object.entries(recentExpenses).map(async ([userId, expenses]) => {
+        await Promise.all(
+          expenses.map(async (expense) => {
+            const category = expense.categoryId;
+
+            const similarExpenses = await Expense.find({
+              userId,
+              categoryId: category,
+              date: {
+                $gte: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
+                $lt: expense.date,
+              },
+            });
+
+            const avg =
+              similarExpenses.reduce((sum, e) => sum + e.amount, 0) / (similarExpenses.length || 1);
+
+            if (expense.amount > avg * 1.5 && expense.amount > 50) {
+              await notifyUser({
+                userId,
+                type: 'expense',
+                title: `Nietypowy wydatek w kategorii`,
+                message: `Wydałeś ${expense.amount} zł na kategorię ${category}, co przekracza Twoją średnią (${avg.toFixed(2)} zł) o ponad 50%.`,
+              });
+            }
+          })
+        );
+      })
+    );
+
+    return res.status(200).json({ message: 'Sprawdzono nietypowe wydatki.' });
+  } catch (err) {
+    const error = new Error('Błąd sprawdzania wydatków');
+    error.details = err.message;
+    next(error);
   }
 };
 
 const updateExpense = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
   try {
@@ -66,9 +134,10 @@ const updateExpense = async (req, res) => {
     );
     if (!expense) return res.status(404).json({ message: 'Nie znaleziono' });
     return res.status(200).json({ message: 'Zaktualizowano pomyślnie.', expense });
-  } catch (error) {
-    console.error('Błąd aktualizacji wydatku: ' + error);
-    return res.status(500).json({ message: 'Błąd aktualizacji wydatku.' });
+  } catch (err) {
+    const error = new Error('Błąd aktualizacji wydatku');
+    error.details = err.message;
+    next(error);
   }
 };
 
@@ -77,9 +146,10 @@ const deleteExpense = async (req, res) => {
     const expense = await Expense.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
     if (!expense) return res.status(404).json({ message: 'Nie znaleziono' });
     return res.status(200).json({ message: 'Usunięto wydatek' });
-  } catch (error) {
-    console.error('Błąd usuwania wydatku: ' + error);
-    return res.status(500).json({ message: 'Błąd usuwania wydatku.' });
+  } catch (err) {
+    const error = new Error('Błąd usuwania wydatku');
+    error.details = err.message;
+    next(error);
   }
 };
 
@@ -87,6 +157,7 @@ module.exports = {
   createExpense,
   getExpenses,
   getExpense,
+  checkForUnusualExpenses,
   updateExpense,
   deleteExpense,
 };
