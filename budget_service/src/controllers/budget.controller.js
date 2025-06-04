@@ -88,10 +88,9 @@ const getBudget = async (req, res, next) => {
 
 const getSavingSuggestions = async (req, res) => {
   try {
-    const activeBudgets = await Budget.find({ isActive: true });
+    const activeBudgets = await Budget.find({ isActive: true, userId: req.user.id });
 
     const token = req.headers.authorization?.split(' ')[1];
-
     await Promise.all(
       activeBudgets.map(async (budget) => {
         try {

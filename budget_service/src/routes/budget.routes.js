@@ -23,7 +23,7 @@ router.use(authenticate);
 router.post('/', validateCreateBudget, createBudget);
 router.get('/', getBudgets);
 router.get('/:id', getBudget);
-router.get('/saving-suggestions', getSavingSuggestions);
+router.get('/saving/suggestions', getSavingSuggestions);
 router.put('/:id', validateUpdateBudget, updateBudget);
 router.put('/:id/limits', validateAddLimit, addLimit);
 router.put('/:id/check-limits', checkBudgetLimits);
