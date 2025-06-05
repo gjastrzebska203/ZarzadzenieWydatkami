@@ -5,6 +5,7 @@ const budgetSchema = new mongoose.Schema(
     userId: {
       type: String,
       required: true,
+      index: true,
     },
     limits: {
       type: [
@@ -20,18 +21,22 @@ const budgetSchema = new mongoose.Schema(
       enum: ['weekly', 'monthly'],
       default: 'monthly',
       required: true,
+      index: true,
     },
     startDate: {
       type: Date,
       required: true,
+      index: true,
     },
     endDate: {
       type: Date,
       required: true,
+      index: true,
     },
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
   },
   {

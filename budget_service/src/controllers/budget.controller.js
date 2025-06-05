@@ -61,6 +61,32 @@ const getBudgets = async (req, res, next) => {
   }
 };
 
+const getBudgetSummary = async (req, res, next) => {
+  try {
+    const result = await Budget.aggregate([
+      { $match: { userId: req.user.id } },
+      {
+        $group: {
+          _id: null,
+          totalBudgets: { $sum: 1 },
+          totalLimitAmount: {
+            $sum: {
+              $sum: '$limits.amount',
+            },
+          },
+        },
+      },
+    ]);
+
+    const summary = result[0] || { totalBudgets: 0, totalLimitAmount: 0 };
+    return res.status(200).json({ summary });
+  } catch (err) {
+    const error = new Error('Błąd podczas agregacji budżetów');
+    error.details = err.message;
+    next(error);
+  }
+};
+
 const getBudget = async (req, res, next) => {
   try {
     const budget = await Budget.findOne({ _id: req.params.id, userId: req.user.id });
@@ -310,6 +336,7 @@ module.exports = {
   createBudget,
   getBudgets,
   getBudget,
+  getBudgetSummary,
   getSavingSuggestions,
   updateBudget,
   addLimit,
