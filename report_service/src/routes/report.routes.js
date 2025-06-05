@@ -15,7 +15,7 @@ router.use(authenticate);
 
 router.post('/', validateCreateReport, createReport);
 router.get('/', getReports);
-router.get('/all/reports', authorizeRole, getAllReports);
+router.get('/all/reports', authorizeRole('admin'), getAllReports);
 router.get('/:id', getReportById);
 router.get('/yearly/summary', getYearlyReportSummary);
 router.delete('/:id', deleteReport);

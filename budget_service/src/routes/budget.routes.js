@@ -25,7 +25,7 @@ router.use(authenticate);
 router.post('/', validateCreateBudget, createBudget);
 router.get('/', getBudgets);
 router.get('/:id', getBudget);
-router.get('/all/budgets', authorizeRole, getAllBudgets);
+router.get('/all/budgets', authorizeRole('admin'), getAllBudgets);
 router.get('/get/summary', getBudgetSummary);
 router.get('/saving/suggestions', getSavingSuggestions);
 router.put('/:id', validateUpdateBudget, updateBudget);

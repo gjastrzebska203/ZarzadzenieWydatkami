@@ -18,7 +18,7 @@ router.use(authenticate);
 
 router.post('/', validateCreateCategory, createCategory);
 router.get('/', getCategories);
-router.get('/all/categories', authorizeRole, getAllCategories);
+router.get('/all/categories', authorizeRole('admin'), getAllCategories);
 router.get('/:id', getCategoryById);
 router.put('/:id', validateUpdateCategory, updateCategory);
 router.delete('/:id', deleteCategory);

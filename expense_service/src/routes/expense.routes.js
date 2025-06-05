@@ -21,7 +21,7 @@ router.use(authenticate);
 router.post('/', validateCreateExpense, createExpense);
 router.get('/', getExpenses);
 router.get('/:id', getExpense);
-router.get('/all/expenses', authorizeRole, getAllExpenses);
+router.get('/all/expenses', authorizeRole('admin'), getAllExpenses);
 router.get('/get/summary', getExpenseSummary);
 router.get('/unusual/check', checkForUnusualExpenses);
 router.put('/:id', validateUpdateExpense, updateExpense);

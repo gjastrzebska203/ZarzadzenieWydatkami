@@ -19,7 +19,7 @@ router.use(authenticate);
 
 router.post('/', validateCreateNotification, createNotification);
 router.get('/', getNotifications);
-router.get('/all/notifications', authorizeRole, getAllNotifications);
+router.get('/all/notifications', authorizeRole('admin'), getAllNotifications);
 router.get('/:id', getNotificationById);
 router.get('/unread/count', getUnreadCount);
 router.put('/:id', validateUpdateNotification, updateNotification);

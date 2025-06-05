@@ -20,7 +20,7 @@ router.use(authenticate);
 
 router.post('/', validateCreateInvestment, createInvestment);
 router.get('/', getInvestments);
-router.get('/all/investments', authorizeRole, getAllInvestments);
+router.get('/all/investments', authorizeRole('admin'), getAllInvestments);
 router.get('/:id', getInvestment);
 router.get('/get/summary', getInvestmentSummary);
 router.get('/:id/simulate', investmentSimulation);

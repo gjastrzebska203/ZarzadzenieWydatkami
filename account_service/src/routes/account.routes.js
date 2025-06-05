@@ -21,7 +21,7 @@ router.use(authenticate);
 
 router.post('/', validateCreateAccount, createAccount);
 router.get('/', getAccounts);
-router.get('/all/accounts', authorizeRole, getAllAccounts);
+router.get('/all/accounts', authorizeRole('admin'), getAllAccounts);
 router.get('/:id', getAccount);
 router.get('/total/balance', getTotalBalance);
 router.put('/:id', validateUpdateAccount, updateAccount);
