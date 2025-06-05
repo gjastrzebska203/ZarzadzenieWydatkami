@@ -3,6 +3,7 @@ const {
   createAccount,
   getAccounts,
   getAccount,
+  getTotalBalance,
   updateAccount,
   deleteAccount,
   transferFunds,
@@ -20,6 +21,7 @@ router.use(authenticate);
 router.post('/', validateCreateAccount, createAccount);
 router.get('/', getAccounts);
 router.get('/:id', getAccount);
+router.get('/total/balance', getTotalBalance);
 router.put('/:id', validateUpdateAccount, updateAccount);
 router.delete('/:id', deleteAccount);
 router.post('/transfer', validateTransferFunds, transferFunds);

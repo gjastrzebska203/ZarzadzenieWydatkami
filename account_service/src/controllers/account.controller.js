@@ -55,6 +55,27 @@ const getAccount = async (req, res, next) => {
   }
 };
 
+const getTotalBalance = async (req, res, next) => {
+  try {
+    const result = await Account.aggregate([
+      { $match: { userId: req.user.id } },
+      {
+        $group: {
+          _id: null,
+          totalBalance: { $sum: '$balance' },
+        },
+      },
+    ]);
+
+    const total = result[0]?.totalBalance || 0;
+    res.status(200).json({ totalBalance: total });
+  } catch (err) {
+    const error = new Error('Błąd agregacji salda');
+    error.details = err.message;
+    next(error);
+  }
+};
+
 const updateAccount = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -144,6 +165,7 @@ module.exports = {
   createAccount,
   getAccounts,
   getAccount,
+  getTotalBalance,
   updateAccount,
   deleteAccount,
   transferFunds,

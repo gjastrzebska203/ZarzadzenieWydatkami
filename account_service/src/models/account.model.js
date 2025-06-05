@@ -5,6 +5,7 @@ const accountSchema = new mongoose.Schema(
     userId: {
       type: String,
       required: true,
+      index: true,
     },
     name: {
       type: String,
@@ -14,6 +15,7 @@ const accountSchema = new mongoose.Schema(
       type: String,
       enum: ['cash', 'card', 'bank', 'e-wallet'],
       required: true,
+      index: true,
     },
     currency: {
       type: String,
@@ -26,6 +28,7 @@ const accountSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
   },
   {
