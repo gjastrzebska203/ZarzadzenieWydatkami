@@ -12,6 +12,7 @@ const createAccount = async (req, res, next) => {
 
   try {
     const { name, type, currency, balance, isActive } = req.body;
+
     const account = await Account.create({
       userId: req.user.id,
       name,
@@ -30,6 +31,8 @@ const createAccount = async (req, res, next) => {
 
 const getAccounts = async (req, res, next) => {
   try {
+    console.log('getting account');
+    console.log(req.user.role);
     const accounts = await Account.find({ userId: req.user.id });
     return res.status(200).json({ message: 'Znaleziono rachunki.', accounts });
   } catch (err) {

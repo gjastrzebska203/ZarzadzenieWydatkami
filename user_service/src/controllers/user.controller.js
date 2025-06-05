@@ -67,7 +67,7 @@ const loginUser = async (req, res) => {
       error.details = err.message;
       next(error);
     }
-    const token = jwt.sign({ id: user.id, le: user.role }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '5h',
     });
     res.status(200).json({
@@ -144,6 +144,11 @@ const getProfile = async (req, res) => {
   res.status(200).json({ id, email, full_name, role, language, currency });
 };
 
+const getUsers = async (req, res) => {
+  const { id, email, full_name, role, language, currency } = req.user;
+  res.status(200).json({ id, email, full_name, role, language, currency });
+};
+
 const updateProfile = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -213,6 +218,7 @@ module.exports = {
   forgotPassword,
   resetPassword,
   getProfile,
+  getUsers,
   updateProfile,
   changePassword,
   deleteAccount,
