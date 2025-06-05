@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 const Notification = require('../models/notifications.model');
 
-const createNotification = async (req, res) => {
+const createNotification = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Błąd walidacji');
@@ -26,7 +26,7 @@ const createNotification = async (req, res) => {
   }
 };
 
-const getNotifications = async (req, res) => {
+const getNotifications = async (req, res, next) => {
   try {
     const notifications = await Notification.find({ userId: req.user.id }).sort({ createdAt: -1 });
     res.status(200).json({ message: 'Znaleziono powiadomienia.', notifications });
@@ -37,7 +37,7 @@ const getNotifications = async (req, res) => {
   }
 };
 
-const getNotificationById = async (req, res) => {
+const getNotificationById = async (req, res, next) => {
   try {
     const notification = await Notification.findOne({ _id: req.params.id, userId: req.user.id });
     if (!notification) return res.status(404).json({ message: 'Nie znaleziono powiadomienia' });
@@ -64,7 +64,7 @@ const getUnreadCount = async (req, res, next) => {
   }
 };
 
-const updateNotification = async (req, res) => {
+const updateNotification = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Błąd walidacji');
@@ -90,7 +90,7 @@ const updateNotification = async (req, res) => {
   }
 };
 
-const deleteNotification = async (req, res) => {
+const deleteNotification = async (req, res, next) => {
   try {
     const deleted = await Notification.findOneAndDelete({
       _id: req.params.id,

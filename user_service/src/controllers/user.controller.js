@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const { sendResetEmail } = require('../utils/mailer');
 const { Op } = require('sequelize');
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Błąd walidacji');
@@ -23,6 +23,7 @@ const registerUser = async (req, res) => {
       full_name,
       language,
       currency,
+      role: role ?? 'user',
     });
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '5h',
@@ -44,7 +45,7 @@ const registerUser = async (req, res) => {
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Błąd walidacji');
@@ -87,7 +88,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-const forgotPassword = async (req, res) => {
+const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ where: { email } });
@@ -110,7 +111,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-const resetPassword = async (req, res) => {
+const resetPassword = async (req, res, next) => {
   try {
     const { token, newPassword } = req.body;
     const user = await User.findOne({
@@ -139,17 +140,17 @@ const resetPassword = async (req, res) => {
   }
 };
 
-const getProfile = async (req, res) => {
+const getProfile = async (req, res, next) => {
   const { id, email, full_name, role, language, currency } = req.user;
   res.status(200).json({ id, email, full_name, role, language, currency });
 };
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   const { id, email, full_name, role, language, currency } = req.user;
   res.status(200).json({ id, email, full_name, role, language, currency });
 };
 
-const updateProfile = async (req, res) => {
+const updateProfile = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Błąd walidacji');
@@ -173,7 +174,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
-const changePassword = async (req, res) => {
+const changePassword = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Błąd walidacji');
@@ -201,7 +202,7 @@ const changePassword = async (req, res) => {
   }
 };
 
-const deleteAccount = async (req, res) => {
+const deleteAccount = async (req, res, next) => {
   try {
     await req.user.destroy();
     res.status(200).json({ message: 'Konto zostało usunięte.' });

@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 const Expense = require('../models/expense.model');
 
-const createExpense = async (req, res) => {
+const createExpense = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Błąd walidacji');
@@ -31,7 +31,7 @@ const createExpense = async (req, res) => {
   }
 };
 
-const getExpenses = async (req, res) => {
+const getExpenses = async (req, res, next) => {
   try {
     const { budgetId, from, to } = req.query;
     const query = {
@@ -50,7 +50,7 @@ const getExpenses = async (req, res) => {
   }
 };
 
-const getExpense = async (req, res) => {
+const getExpense = async (req, res, next) => {
   try {
     const expense = await Expense.findOne({ _id: req.params.id, userId: req.user.id });
     if (!expense) return res.status(404).json({ message: 'Wydatek nie znaleziony' });
@@ -61,6 +61,7 @@ const getExpense = async (req, res) => {
     next(error);
   }
 };
+
 const getExpenseSummary = async (req, res, next) => {
   try {
     const { budgetId } = req.query;
@@ -156,7 +157,7 @@ const checkForUnusualExpenses = async (req, res, next) => {
   }
 };
 
-const updateExpense = async (req, res) => {
+const updateExpense = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Błąd walidacji');
@@ -181,7 +182,7 @@ const updateExpense = async (req, res) => {
   }
 };
 
-const deleteExpense = async (req, res) => {
+const deleteExpense = async (req, res, next) => {
   try {
     const expense = await Expense.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
     if (!expense) return res.status(404).json({ message: 'Nie znaleziono' });

@@ -1,5 +1,5 @@
 const express = require('express');
-const { authenticate } = require('../middlewares/auth.middleware');
+const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 const {
   registerUser,
   loginUser,
@@ -24,7 +24,7 @@ router.post('/register', validateRegister, registerUser);
 router.post('/login', validateLogin, loginUser);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
-router.get('/', getUsers);
+router.get('/', authenticate, authorizeRole('admin'), getUsers);
 router.get('/me', authenticate, getProfile);
 router.put('/me', authenticate, validateUpdateProfile, updateProfile);
 router.put('/change-password', authenticate, validateChangePassword, changePassword);

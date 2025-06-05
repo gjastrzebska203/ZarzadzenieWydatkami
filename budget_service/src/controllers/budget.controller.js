@@ -112,7 +112,7 @@ const getBudget = async (req, res, next) => {
   }
 };
 
-const getSavingSuggestions = async (req, res) => {
+const getSavingSuggestions = async (req, res, next) => {
   try {
     const activeBudgets = await Budget.find({ isActive: true, userId: req.user.id });
 
