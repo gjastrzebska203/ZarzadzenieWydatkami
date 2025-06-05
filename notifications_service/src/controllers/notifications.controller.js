@@ -4,7 +4,10 @@ const Notification = require('../models/notifications.model');
 const createNotification = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
   try {
@@ -16,9 +19,10 @@ const createNotification = async (req, res) => {
       message,
     });
     res.status(201).json({ message: 'Utworzono powiadomienie.', notification });
-  } catch (error) {
-    console.error('Błąd tworzenia powiadomienia: ' + error);
-    return res.status(500).json({ message: 'Błąd tworzenia powiadomienia.' });
+  } catch (err) {
+    const error = new Error('Błąd tworzenia powiadomienie');
+    error.details = err.message;
+    next(error);
   }
 };
 
@@ -26,9 +30,10 @@ const getNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find({ userId: req.user.id }).sort({ createdAt: -1 });
     res.status(200).json({ message: 'Znaleziono powiadomienia.', notifications });
-  } catch (error) {
-    console.error('Błąd pobierania powiadomień: ' + error);
-    return res.status(500).json({ message: 'Błąd pobierania powiadomień.' });
+  } catch (err) {
+    const error = new Error('Błąd pobierania powiadomień');
+    error.details = err.message;
+    next(error);
   }
 };
 
@@ -37,16 +42,20 @@ const getNotificationById = async (req, res) => {
     const notification = await Notification.findOne({ _id: req.params.id, userId: req.user.id });
     if (!notification) return res.status(404).json({ message: 'Nie znaleziono powiadomienia' });
     res.status(200).json({ message: 'Znaleziono powiadomienie', notification });
-  } catch (error) {
-    console.error('Błąd pobierania powiadomienia: ' + error);
-    return res.status(500).json({ message: 'Błąd pobierania powiadomienia.' });
+  } catch (err) {
+    const error = new Error('Błąd pobierania powiadomienia');
+    error.details = err.message;
+    next(error);
   }
 };
 
 const updateNotification = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
   try {
@@ -59,9 +68,10 @@ const updateNotification = async (req, res) => {
     notification.isRead = isRead ?? notification.isRead;
     await notification.save();
     return res.status(200).json({ message: 'Zaktualizowano powiadomienie.', notification });
-  } catch (error) {
-    console.error('Błąd aktualizacji powiadomienia: ' + error);
-    return res.status(500).json({ message: 'Błąd aktualizacji powiadomienia.' });
+  } catch (err) {
+    const error = new Error('Błąd aktualizacji powiadomienia');
+    error.details = err.message;
+    next(error);
   }
 };
 
@@ -73,9 +83,10 @@ const deleteNotification = async (req, res) => {
     });
     if (!deleted) return res.status(404).json({ message: 'Nie znaleziono powiadomienia' });
     return res.status(200).json({ message: 'Usunięto powiadomienie' });
-  } catch (error) {
-    console.error('Błąd usunięcia powiadomienia: ' + error);
-    return res.status(500).json({ message: 'Błąd usunięcia powiadomienia.' });
+  } catch (err) {
+    const error = new Error('Błąd usuwania powiadomienia');
+    error.details = err.message;
+    next(error);
   }
 };
 

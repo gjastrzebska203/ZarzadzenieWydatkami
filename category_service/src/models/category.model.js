@@ -46,6 +46,21 @@ module.exports = (sequelize) => {
     {
       tableName: 'categories',
       timestamps: false,
+      indexes: [
+        {
+          fields: ['user_id'],
+        },
+        {
+          fields: ['parent_category_id'],
+        },
+        {
+          fields: ['created_at'],
+        },
+        {
+          unique: true,
+          fields: ['user_id', 'name'],
+        },
+      ],
     }
   );
 

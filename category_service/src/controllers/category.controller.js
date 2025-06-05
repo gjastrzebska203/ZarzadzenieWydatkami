@@ -1,5 +1,6 @@
 const { Category } = require('../models');
 const { validationResult } = require('express-validator');
+const { sequelize } = require('../config/db');
 
 const createCategory = async (req, res, next) => {
   const errors = validationResult(req);
@@ -12,6 +13,19 @@ const createCategory = async (req, res, next) => {
 
   try {
     const { name, color, icon, parent_category_id } = req.body;
+
+    const existing = await Category.findOne({
+      where: {
+        user_id: req.user.id,
+        name,
+      },
+    });
+
+    if (existing) {
+      const error = new Error('Użytkownik ma już kategorię o tej nazwie');
+      error.status = 409;
+      return next(error);
+    }
     const category = await Category.create({
       user_id: req.user.id,
       name,
@@ -32,9 +46,20 @@ const createCategory = async (req, res, next) => {
 const getCategories = async (req, res, next) => {
   try {
     const categories = await Category.findAll({
-      where: { user_id: req.user.id },
+      where: {
+        user_id: req.user.id,
+        parent_category_id: null, // tylko główne
+      },
+      include: [
+        {
+          model: Category,
+          as: 'subcategories', // alias zgodny z .hasMany
+          required: false,
+        },
+      ],
       order: [['created_at', 'ASC']],
     });
+
     return res.status(200).json({ categories: categories });
   } catch (err) {
     const error = new Error('Błąd pobierania kategorii');
@@ -46,7 +71,14 @@ const getCategories = async (req, res, next) => {
 const getCategoryById = async (req, res, next) => {
   try {
     const category = await Category.findOne({
-      where: { user_id: req.user.id, id: req.params.id },
+      where: {
+        id: req.params.id,
+        user_id: req.user.id,
+      },
+      include: {
+        model: Category,
+        as: 'subcategories',
+      },
     });
     return res.status(200).json({ message: 'Znaleziono kategorię', category });
   } catch (err) {
@@ -70,7 +102,9 @@ const updateCategory = async (req, res, next) => {
       where: { id: req.params.id, user_id: req.user.id },
     });
     if (!category) {
-      return res.status(404).json({ message: 'Nie znaleziono kategorii.' });
+      const error = new Error('Nie znaleziono kategorii');
+      error.details = err.message;
+      next(error);
     }
     const { name, color, icon, parent_category_id } = req.body;
     category.name = name ?? category.name;
@@ -88,16 +122,33 @@ const updateCategory = async (req, res, next) => {
 };
 
 const deleteCategory = async (req, res, next) => {
+  const t = await sequelize.transaction();
+
   try {
     const category = await Category.findOne({
       where: { id: req.params.id, user_id: req.user.id },
+      transaction: t,
     });
     if (!category) {
-      return res.status(404).json({ message: 'Nie znaleziono kategorii.' });
+      const error = new Error('Nie znaleziono kategorii');
+      error.details = err.message;
+      next(error);
     }
-    await category.destroy();
-    return res.status(200).json({ message: 'Kategoria usunięta.' });
+
+    await Category.destroy({
+      where: {
+        parent_category_id: category.id,
+        user_id: req.user.id,
+      },
+      transaction: t,
+    });
+
+    await category.destroy({ transaction: t });
+
+    await t.commit();
+    return res.status(200).json({ message: 'Kategoria i jej podkategorie usunięte.' });
   } catch (err) {
+    await t.rollback();
     const error = new Error('Błąd usuwania kategorii');
     error.details = err.message;
     next(error);

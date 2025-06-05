@@ -9,10 +9,11 @@ const { Op } = require('sequelize');
 const registerUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
-
-  const { email, password, full_name, language, currency } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -36,27 +37,35 @@ const registerUser = async (req, res) => {
         role: user.role,
       },
     });
-  } catch (error) {
-    console.error('Błąd rejestracji: ' + error);
-    return res.status(500).json({ message: 'Błąd rejestracji.' });
+  } catch (err) {
+    const error = new Error('Błąd rejestracji');
+    error.details = err.message;
+    next(error);
   }
 };
 
 const loginUser = async (req, res) => {
   const errors = validationResult(req);
-  if (!errors.isEmpty) {
-    return res.status(400).json({ errors: errors.array() });
+  if (!errors.isEmpty()) {
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(401).json({ message: 'Nieprawidłowy email lub hasło.' });
+      const error = new Error('Nieprawdiłowy email lub hasło');
+      error.details = err.message;
+      next(error);
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Nieprawidłowy email lub hasło' });
+      const error = new Error('Nieprawdiłowy email lub hasło');
+      error.details = err.message;
+      next(error);
     }
     const token = jwt.sign({ id: user.id, le: user.role }, process.env.JWT_SECRET, {
       expiresIn: '5h',
@@ -71,19 +80,21 @@ const loginUser = async (req, res) => {
         role: user.role,
       },
     });
-  } catch (error) {
-    console.error('Błąd logowania: ' + error);
-    return res.status(500).json({ message: 'Błąd logowania.' });
+  } catch (err) {
+    const error = new Error('Błąd logowania');
+    error.details = err.message;
+    next(error);
   }
 };
 
 const forgotPassword = async (req, res) => {
-  const { email } = req.body;
-
   try {
+    const { email } = req.body;
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(400).message({ message: 'Konto nie istnieje.' });
+      const error = new Error('Konto nie znalezione');
+      error.details = err.message;
+      next(error);
     }
     const token = uuidv4();
     const expiry = new Date(Date.now() + 60 * 60 * 1000);
@@ -92,16 +103,16 @@ const forgotPassword = async (req, res) => {
     await user.save();
     await sendResetEmail(user.email, token);
     res.status(200).json({ message: 'Wysłano link resetujący.', token: token });
-  } catch (error) {
-    console.error('Błąd forgotPassword: ' + error);
-    return res.status(500).json({ message: 'Błąd forgotPassword.' });
+  } catch (err) {
+    const error = new Error('Błąd forgot password');
+    error.details = err.message;
+    next(error);
   }
 };
 
 const resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
-
   try {
+    const { token, newPassword } = req.body;
     const user = await User.findOne({
       where: {
         reset_token: token,
@@ -111,7 +122,9 @@ const resetPassword = async (req, res) => {
       },
     });
     if (!user) {
-      return res.status(400).json({ message: 'Nieprawidłowy lub wygasły token.' });
+      const error = new Error('Konto nie znalezione, nieprawidłowy lub wygasły token');
+      error.details = err.message;
+      next(error);
     }
     const hashed = await bcrypt.hash(newPassword, 10);
     user.password = hashed;
@@ -119,9 +132,10 @@ const resetPassword = async (req, res) => {
     user.reset_tokenexpiry = null;
     await user.save();
     return res.status(200).json({ message: 'Hasło zostało zmienione.' });
-  } catch (error) {
-    console.error('Błąd resetPassword: ' + error);
-    return res.status(500).json({ message: 'Błąd resetPassword.' });
+  } catch (err) {
+    const error = new Error('Błąd reset password');
+    error.details = err.message;
+    next(error);
   }
 };
 
@@ -133,41 +147,52 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
-  const { email, full_name, language, currency } = req.body;
   try {
+    const { email, full_name, language, currency } = req.body;
     req.user.email = email || req.user.email;
     req.user.full_name = full_name || req.user.full_name;
     req.user.language = language || req.user.language;
     req.user.currency = currency || req.user.currency;
     await req.user.save();
     res.status(200).json({ message: 'Zaktualizowano pomyślnie.', user: req.user });
-  } catch (error) {
-    console.error('Błąd aktualizacji profilu: ' + error);
-    return res.status(500).json({ message: 'Błąd aktualizacji profilu.' });
+  } catch (err) {
+    const error = new Error('Błąd aktualizacji profilu');
+    error.details = err.message;
+    next(error);
   }
 };
 
 const changePassword = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const error = new Error('Błąd walidacji');
+    error.status = 400;
+    error.details = errors.array();
+    return next(error);
   }
 
-  const { currentPassword, newPassword } = req.body;
-
   try {
+    const { currentPassword, newPassword } = req.body;
     const isMatch = await bcrypt.compare(currentPassword, req.user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Nieprawidłowe obecne hasło' });
+    if (!isMatch) {
+      const error = new Error('Nieprawidłowe obecne hasło');
+      error.details = err.message;
+      next(error);
+    }
     const hashed = await bcrypt.hash(newPassword, 10);
     req.user.password = hashed;
     await req.user.save();
-    res.json({ message: 'Hasło zmienione' });
-  } catch (error) {
-    console.error('Błąd zmiany hasła: ' + error);
-    return res.status(500).json({ message: 'Błąd zmiany hasła.' });
+    res.status(200).json({ message: 'Hasło zmienione' });
+  } catch (err) {
+    const error = new Error('Błąd zmiany hasła');
+    error.details = err.message;
+    next(error);
   }
 };
 
@@ -175,9 +200,10 @@ const deleteAccount = async (req, res) => {
   try {
     await req.user.destroy();
     res.status(200).json({ message: 'Konto zostało usunięte.' });
-  } catch (error) {
-    console.error('Błąd usuwania konta: ' + error);
-    return res.status(500).json({ message: 'Błąd usuwania konta.' });
+  } catch (err) {
+    const error = new Error('Błąd usuwania konta');
+    error.details = err.message;
+    next(error);
   }
 };
 

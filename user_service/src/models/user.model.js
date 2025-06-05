@@ -62,6 +62,25 @@ module.exports = (sequelize) => {
     {
       tableName: 'users',
       timestamps: false,
+      indexes: [
+        {
+          name: 'idx_reset_token_expiry',
+          fields: ['reset_token', 'reset_token_expiry'],
+        },
+        {
+          name: 'idx_email',
+          unique: true,
+          fields: ['email'],
+        },
+        {
+          name: 'idx_role',
+          fields: ['role'],
+        },
+        {
+          name: 'idx_created_at',
+          fields: ['created_at'],
+        },
+      ],
     }
   );
 
