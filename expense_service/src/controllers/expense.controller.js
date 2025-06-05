@@ -61,6 +61,46 @@ const getExpense = async (req, res) => {
     next(error);
   }
 };
+const getExpenseSummary = async (req, res, next) => {
+  try {
+    const { budgetId } = req.query;
+
+    const matchStage = {
+      userId: req.user.id,
+    };
+
+    if (budgetId) matchStage.budgetId = budgetId;
+
+    const result = await Expense.aggregate([
+      { $match: matchStage },
+      {
+        $group: {
+          _id: '$categoryId',
+          total: { $sum: '$amount' },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSpent: { $sum: '$total' },
+          byCategory: {
+            $push: {
+              category: '$_id',
+              total: '$total',
+            },
+          },
+        },
+      },
+    ]);
+
+    const summary = result[0] || { totalSpent: 0, byCategory: [] };
+    return res.status(200).json({ summary });
+  } catch (err) {
+    const error = new Error('Błąd agregacji wydatków');
+    error.details = err.message;
+    next(error);
+  }
+};
 
 const checkForUnusualExpenses = async (req, res, next) => {
   try {
@@ -157,6 +197,7 @@ module.exports = {
   createExpense,
   getExpenses,
   getExpense,
+  getExpenseSummary,
   checkForUnusualExpenses,
   updateExpense,
   deleteExpense,
