@@ -37,6 +37,9 @@ const notificationSchema = new mongoose.Schema(
   }
 );
 
-notificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL auto-delete
+notificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+notificationSchema.index({ userId: 1, createdAt: -1 });
+notificationSchema.index({ userId: 1, isRead: 1 });
+notificationSchema.index({ type: 1 });
 
 module.exports = mongoose.model('Notification', notificationSchema);

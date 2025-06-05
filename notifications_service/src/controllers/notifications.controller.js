@@ -49,6 +49,21 @@ const getNotificationById = async (req, res) => {
   }
 };
 
+const getUnreadCount = async (req, res, next) => {
+  try {
+    const result = await Notification.aggregate([
+      { $match: { userId: req.user.id, isRead: false } },
+      { $group: { _id: null, count: { $sum: 1 } } },
+    ]);
+    const count = result[0]?.count || 0;
+    res.status(200).json({ message: 'Liczba nieprzeczytanych powiadomień', count });
+  } catch (err) {
+    const error = new Error('Błąd agregacji');
+    error.details = err.message;
+    next(error);
+  }
+};
+
 const updateNotification = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -94,6 +109,7 @@ module.exports = {
   createNotification,
   getNotifications,
   getNotificationById,
+  getUnreadCount,
   updateNotification,
   deleteNotification,
 };

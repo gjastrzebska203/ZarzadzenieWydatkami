@@ -3,6 +3,7 @@ const {
   createNotification,
   getNotifications,
   getNotificationById,
+  getUnreadCount,
   updateNotification,
   deleteNotification,
 } = require('../controllers/notifications.controller');
@@ -18,6 +19,7 @@ router.use(authenticate);
 router.post('/', validateCreateNotification, createNotification);
 router.get('/', getNotifications);
 router.get('/:id', getNotificationById);
+router.get('/unread/count', getUnreadCount);
 router.put('/:id', validateUpdateNotification, updateNotification);
 router.delete('/:id', deleteNotification);
 
