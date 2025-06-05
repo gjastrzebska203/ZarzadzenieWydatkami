@@ -50,6 +50,17 @@ const getExpenses = async (req, res, next) => {
   }
 };
 
+const getAllExpenses = async (req, res, next) => {
+  try {
+    const expenses = await Expense.find();
+    return res.status(200).json({ message: 'Znaleziono wydatek', expenses });
+  } catch (err) {
+    const error = new Error('Błąd pobierania wydatku');
+    error.details = err.message;
+    next(error);
+  }
+};
+
 const getExpense = async (req, res, next) => {
   try {
     const expense = await Expense.findOne({ _id: req.params.id, userId: req.user.id });
@@ -198,6 +209,7 @@ module.exports = {
   createExpense,
   getExpenses,
   getExpense,
+  getAllExpenses,
   getExpenseSummary,
   checkForUnusualExpenses,
   updateExpense,

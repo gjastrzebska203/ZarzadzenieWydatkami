@@ -3,6 +3,7 @@ const {
   createNotification,
   getNotifications,
   getNotificationById,
+  getAllNotifications,
   getUnreadCount,
   updateNotification,
   deleteNotification,
@@ -11,13 +12,14 @@ const {
   validateCreateNotification,
   validateUpdateNotification,
 } = require('../middlewares/validate.middleware');
-const { authenticate } = require('../middlewares/auth.middleware');
+const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 router.use(authenticate);
 
 router.post('/', validateCreateNotification, createNotification);
 router.get('/', getNotifications);
+router.get('/all/notifications', authorizeRole, getAllNotifications);
 router.get('/:id', getNotificationById);
 router.get('/unread/count', getUnreadCount);
 router.put('/:id', validateUpdateNotification, updateNotification);

@@ -1,10 +1,11 @@
 const express = require('express');
-const { authenticate } = require('../middlewares/auth.middleware');
+const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 const {
   createExpense,
   getExpenses,
   getExpense,
   getExpenseSummary,
+  getAllExpenses,
   checkForUnusualExpenses,
   updateExpense,
   deleteExpense,
@@ -20,6 +21,7 @@ router.use(authenticate);
 router.post('/', validateCreateExpense, createExpense);
 router.get('/', getExpenses);
 router.get('/:id', getExpense);
+router.get('/all/expenses', authorizeRole, getAllExpenses);
 router.get('/get/summary', getExpenseSummary);
 router.get('/unusual/check', checkForUnusualExpenses);
 router.put('/:id', validateUpdateExpense, updateExpense);

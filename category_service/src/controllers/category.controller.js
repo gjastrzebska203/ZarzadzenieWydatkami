@@ -48,18 +48,29 @@ const getCategories = async (req, res, next) => {
     const categories = await Category.findAll({
       where: {
         user_id: req.user.id,
-        parent_category_id: null, // tylko główne
+        parent_category_id: null,
       },
       include: [
         {
           model: Category,
-          as: 'subcategories', // alias zgodny z .hasMany
+          as: 'subcategories',
           required: false,
         },
       ],
       order: [['created_at', 'ASC']],
     });
 
+    return res.status(200).json({ categories: categories });
+  } catch (err) {
+    const error = new Error('Błąd pobierania kategorii');
+    error.details = err.message;
+    next(error);
+  }
+};
+
+const getAllCategories = async (req, res, next) => {
+  try {
+    const categories = await Category.findAll();
     return res.status(200).json({ categories: categories });
   } catch (err) {
     const error = new Error('Błąd pobierania kategorii');
@@ -159,6 +170,7 @@ module.exports = {
   createCategory,
   getCategories,
   getCategoryById,
+  getAllCategories,
   updateCategory,
   deleteCategory,
 };

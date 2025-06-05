@@ -1,9 +1,10 @@
 const express = require('express');
-const { authenticate } = require('../middlewares/auth.middleware');
+const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 const {
   createReport,
   getReports,
   getReportById,
+  getAllReports,
   getYearlyReportSummary,
   deleteReport,
 } = require('../controllers/report.controller');
@@ -14,6 +15,7 @@ router.use(authenticate);
 
 router.post('/', validateCreateReport, createReport);
 router.get('/', getReports);
+router.get('/all/reports', authorizeRole, getAllReports);
 router.get('/:id', getReportById);
 router.get('/yearly/summary', getYearlyReportSummary);
 router.delete('/:id', deleteReport);

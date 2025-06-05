@@ -40,6 +40,17 @@ const getInvestments = async (req, res, next) => {
   }
 };
 
+const getAllInvestments = async (req, res, next) => {
+  try {
+    const investments = await Investment.find();
+    return res.status(200).json({ message: 'Znaleziono cele.', investments });
+  } catch (err) {
+    const error = new Error('Błąd pobierania celów');
+    error.details = err.message;
+    next(error);
+  }
+};
+
 const getInvestment = async (req, res, next) => {
   try {
     const investment = await Investment.findOne({ _id: req.params.id, userId: req.user.id });
@@ -158,6 +169,7 @@ module.exports = {
   createInvestment,
   getInvestments,
   getInvestment,
+  getAllInvestments,
   getInvestmentSummary,
   investmentSimulation,
   updateInvestment,

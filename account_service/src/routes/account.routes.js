@@ -3,6 +3,7 @@ const {
   createAccount,
   getAccounts,
   getAccount,
+  getAllAccounts,
   getTotalBalance,
   updateAccount,
   deleteAccount,
@@ -13,13 +14,14 @@ const {
   validateUpdateAccount,
   validateTransferFunds,
 } = require('../middlewares/validate.middleware');
-const { authenticate } = require('../middlewares/auth.middleware');
+const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 router.use(authenticate);
 
 router.post('/', validateCreateAccount, createAccount);
 router.get('/', getAccounts);
+router.get('/all/accounts', authorizeRole, getAllAccounts);
 router.get('/:id', getAccount);
 router.get('/total/balance', getTotalBalance);
 router.put('/:id', validateUpdateAccount, updateAccount);

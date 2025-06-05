@@ -52,7 +52,18 @@ const createBudget = async (req, res, next) => {
 
 const getBudgets = async (req, res, next) => {
   try {
-    const budgets = await Budget.findOne({ userId: req.user.id }).sort({ startDate: -1 });
+    const budgets = await Budget.findAll({ userId: req.user.id }).sort({ startDate: -1 });
+    return res.status(200).json({ message: 'Znaleziono budżety.', budgets });
+  } catch (err) {
+    const error = new Error('Błąd pobierania budżetów');
+    error.details = err.message;
+    next(error);
+  }
+};
+
+const getAllBudgets = async (req, res, next) => {
+  try {
+    const budgets = await Budget.findAll().sort({ startDate: -1 });
     return res.status(200).json({ message: 'Znaleziono budżety.', budgets });
   } catch (err) {
     const error = new Error('Błąd pobierania budżetów');
@@ -336,6 +347,7 @@ module.exports = {
   createBudget,
   getBudgets,
   getBudget,
+  getAllBudgets,
   getBudgetSummary,
   getSavingSuggestions,
   updateBudget,

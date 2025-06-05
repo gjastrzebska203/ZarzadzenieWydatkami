@@ -1,10 +1,11 @@
 const express = require('express');
-const { authenticate } = require('../middlewares/auth.middleware');
+const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 const {
   createInvestment,
   getInvestments,
   getInvestment,
   getInvestmentSummary,
+  getAllInvestments,
   investmentSimulation,
   updateInvestment,
   deleteInvestment,
@@ -19,6 +20,7 @@ router.use(authenticate);
 
 router.post('/', validateCreateInvestment, createInvestment);
 router.get('/', getInvestments);
+router.get('/all/investments', authorizeRole, getAllInvestments);
 router.get('/:id', getInvestment);
 router.get('/get/summary', getInvestmentSummary);
 router.get('/:id/simulate', investmentSimulation);

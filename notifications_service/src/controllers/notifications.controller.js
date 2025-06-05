@@ -37,6 +37,17 @@ const getNotifications = async (req, res, next) => {
   }
 };
 
+const getAllNotifications = async (req, res, next) => {
+  try {
+    const notifications = await Notification.find().sort({ createdAt: -1 });
+    res.status(200).json({ message: 'Znaleziono powiadomienia.', notifications });
+  } catch (err) {
+    const error = new Error('Błąd pobierania powiadomień');
+    error.details = err.message;
+    next(error);
+  }
+};
+
 const getNotificationById = async (req, res, next) => {
   try {
     const notification = await Notification.findOne({ _id: req.params.id, userId: req.user.id });
@@ -109,6 +120,7 @@ module.exports = {
   createNotification,
   getNotifications,
   getNotificationById,
+  getAllNotifications,
   getUnreadCount,
   updateNotification,
   deleteNotification,

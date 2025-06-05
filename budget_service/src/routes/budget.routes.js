@@ -1,9 +1,10 @@
 const express = require('express');
-const { authenticate } = require('../middlewares/auth.middleware');
+const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 const {
   createBudget,
   getBudgets,
   getBudget,
+  getAllBudgets,
   getSavingSuggestions,
   updateBudget,
   addLimit,
@@ -24,6 +25,7 @@ router.use(authenticate);
 router.post('/', validateCreateBudget, createBudget);
 router.get('/', getBudgets);
 router.get('/:id', getBudget);
+router.get('/all/budgets', authorizeRole, getAllBudgets);
 router.get('/get/summary', getBudgetSummary);
 router.get('/saving/suggestions', getSavingSuggestions);
 router.put('/:id', validateUpdateBudget, updateBudget);

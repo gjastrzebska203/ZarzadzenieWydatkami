@@ -31,9 +31,18 @@ const createAccount = async (req, res, next) => {
 
 const getAccounts = async (req, res, next) => {
   try {
-    console.log('getting account');
-    console.log(req.user.role);
     const accounts = await Account.find({ userId: req.user.id });
+    return res.status(200).json({ message: 'Znaleziono rachunki.', accounts });
+  } catch (err) {
+    const error = new Error('Błąd pobierania rachunków');
+    error.details = err.message;
+    next(error);
+  }
+};
+
+const getAllAccounts = async (req, res, next) => {
+  try {
+    const accounts = await Account.find();
     return res.status(200).json({ message: 'Znaleziono rachunki.', accounts });
   } catch (err) {
     const error = new Error('Błąd pobierania rachunków');
@@ -168,6 +177,7 @@ module.exports = {
   createAccount,
   getAccounts,
   getAccount,
+  getAllAccounts,
   getTotalBalance,
   updateAccount,
   deleteAccount,

@@ -109,6 +109,17 @@ const getReportById = async (req, res, next) => {
   }
 };
 
+const getAllReports = async (req, res, next) => {
+  try {
+    const reports = await Report.find().sort({ createdAt: -1 });
+    return res.status(200).json({ message: 'Znaleziono raporty', reports });
+  } catch (err) {
+    const error = new Error('Błąd pobierania raportów');
+    error.details = err.message;
+    next(error);
+  }
+};
+
 const getYearlyReportSummary = async (req, res, next) => {
   try {
     const summary = await Report.aggregate([
@@ -146,6 +157,7 @@ module.exports = {
   createReport,
   getReports,
   getReportById,
+  getAllReports,
   getYearlyReportSummary,
   deleteReport,
 };
