@@ -32,4 +32,7 @@ const investmentSchema = new mongoose.Schema(
   }
 );
 
+investmentSchema.index({ userId: 1 });
+investmentSchema.index({ userId: 1, targetDate: 1 });
+
 module.exports = mongoose.model('Investment', investmentSchema);

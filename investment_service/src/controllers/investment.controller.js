@@ -52,6 +52,50 @@ const getInvestment = async (req, res, next) => {
   }
 };
 
+const getInvestmentSummary = async (req, res, next) => {
+  try {
+    const result = await Investment.aggregate([
+      { $match: { userId: req.user.id } },
+      {
+        $group: {
+          _id: null,
+          totalTarget: { $sum: '$targetAmount' },
+          totalCurrent: { $sum: '$currentAmount' },
+          soonestTargetDate: { $min: '$targetDate' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalTarget: 1,
+          totalCurrent: 1,
+          soonestTargetDate: 1,
+          progress: {
+            $cond: [
+              { $eq: ['$totalTarget', 0] },
+              0,
+              { $divide: ['$totalCurrent', '$totalTarget'] },
+            ],
+          },
+        },
+      },
+    ]);
+
+    const summary = result[0] || {
+      totalTarget: 0,
+      totalCurrent: 0,
+      progress: 0,
+      soonestTargetDate: null,
+    };
+
+    return res.status(200).json({ message: 'Podsumowanie inwestycji', summary });
+  } catch (err) {
+    const error = new Error('Błąd agregacji inwestycji');
+    error.details = err.message;
+    next(error);
+  }
+};
+
 const investmentSimulation = async (req, res, next) => {
   try {
     const investment = await Investment.findOne({ _id: req.params.id, userId: req.user.id });
@@ -114,6 +158,7 @@ module.exports = {
   createInvestment,
   getInvestments,
   getInvestment,
+  getInvestmentSummary,
   investmentSimulation,
   updateInvestment,
   deleteInvestment,

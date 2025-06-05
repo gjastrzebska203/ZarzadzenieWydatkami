@@ -4,6 +4,7 @@ const {
   createInvestment,
   getInvestments,
   getInvestment,
+  getInvestmentSummary,
   investmentSimulation,
   updateInvestment,
   deleteInvestment,
@@ -19,6 +20,7 @@ router.use(authenticate);
 router.post('/', validateCreateInvestment, createInvestment);
 router.get('/', getInvestments);
 router.get('/:id', getInvestment);
+router.get('/get/summary', getInvestmentSummary);
 router.get('/:id/simulate', investmentSimulation);
 router.put('/:id', validateUpdateInvestment, updateInvestment);
 router.delete('/:id', deleteInvestment);
