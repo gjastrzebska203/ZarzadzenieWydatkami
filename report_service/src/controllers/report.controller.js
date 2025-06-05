@@ -109,6 +109,27 @@ const getReportById = async (req, res, next) => {
   }
 };
 
+const getYearlyReportSummary = async (req, res, next) => {
+  try {
+    const summary = await Report.aggregate([
+      { $match: { userId: req.user.id, type: 'yearly' } },
+      {
+        $group: {
+          _id: { year: { $year: '$from' } },
+          totalSpent: { $sum: '$totalAmount' },
+          reports: { $sum: 1 },
+        },
+      },
+      { $sort: { '_id.year': -1 } },
+    ]);
+    res.status(200).json({ message: 'Zestawienie roczne', summary });
+  } catch (err) {
+    const error = new Error('Błąd agregacji raportów');
+    error.details = err.message;
+    next(error);
+  }
+};
+
 const deleteReport = async (req, res, next) => {
   try {
     const result = await Report.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
@@ -125,5 +146,6 @@ module.exports = {
   createReport,
   getReports,
   getReportById,
+  getYearlyReportSummary,
   deleteReport,
 };
