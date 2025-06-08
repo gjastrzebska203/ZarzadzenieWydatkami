@@ -1,0 +1,230 @@
+services:
+  user-service:
+    build:
+      context: ./user_service
+    container_name: user-service
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - JWT_SECRET=superbezpiecznytest123
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - DB_NAME=users_db
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    volumes:
+      - ./user_service:/app
+    env_file:
+      - ./user_service/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/check/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  category-service:
+    build:
+      context: ./category_service
+    container_name: category-service
+    ports:
+      - "4001:4001"
+    environment:
+      - PORT=4001
+      - DB_HOST=postgres
+    depends_on:
+      - user-service
+      - postgres
+    networks:
+      - app-network
+    volumes:
+      - ./category_service:/app
+    env_file:
+      - ./category_service/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001/check/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  budget-service:
+    build:
+      context: ./budget_service
+    container_name: budget-service
+    ports:
+      - "4002:4002"
+    environment:
+      - PORT=4002
+      - MONGO_URI=mongodb://mongo:27017/budget_db
+    depends_on:
+      - mongo
+      - user-service
+      - notifications-service
+      - category-service
+    networks:
+      - app-network
+    volumes:
+      - ./budget_service:/app
+    env_file:
+      - ./budget_service/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4002/check/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  expense-service:
+    build:
+      context: ./expense_service
+    container_name: expense-service
+    ports:
+      - "4003:4003"
+    environment:
+      - PORT=4003
+      - MONGO_URI=mongodb://mongo:27017/expenses_db
+    depends_on:
+      - mongo
+      - user-service
+      - category-service
+      - account-service
+    networks:
+      - app-network
+    volumes:
+      - ./expense_service:/app
+    env_file:
+      - ./expense_service/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4003/check/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  investment-service:
+    build:
+      context: ./investment_service
+    container_name: investment-service
+    ports:
+      - "4004:4004"
+    environment:
+      - PORT=4004
+      - MONGO_URI=mongodb://mongo:27017/investment_db
+    depends_on:
+      - mongo
+      - user-service
+    networks:
+      - app-network
+    volumes:
+      - ./investment_service:/app
+    env_file:
+      - ./investment_service/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4004/check/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  report-service:
+    build:
+      context: ./report_service
+    container_name: report-service
+    ports:
+      - "4005:4005"
+    environment:
+      - PORT=4005
+      - MONGO_URI=mongodb://mongo:27017/report_db
+      - EXPENSE_SERVICE_URL=http://expense-service:4003
+      - CATEGORY_SERVICE_URL=http://category-service:4001
+    depends_on:
+      - mongo
+      - user-service
+      - expense-service
+      - category-service
+    networks:
+      - app-network
+    volumes:
+      - ./report_service:/app
+    env_file:
+      - ./report_service/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4005/check/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  notifications-service:
+    build:
+      context: ./notifications_service
+    container_name: notifications-service
+    ports:
+      - "4006:4006"
+    environment:
+      - PORT=4006
+      - MONGO_URI=mongodb://mongo:27017/notifications_db
+    depends_on:
+      - mongo
+      - user-service
+    networks:
+      - app-network
+    volumes:
+      - ./notifications_service:/app
+    env_file:
+      - ./notifications_service/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4006/check/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  account-service:
+    build:
+      context: ./account_service
+    container_name: account-service
+    ports:
+      - "4007:4007"
+    environment:
+      - PORT=4007.
+      - MONGO_URI=mongodb://mongo:27017/account_db
+    depends_on:
+      - mongo
+      - user-service
+    networks:
+      - app-network
+    volumes:
+      - ./account_service:/app
+    env_file:
+      - ./account_service/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4007/check/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+  mongo:
+    image: mongo:5
+    container_name: mongo
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  pg_data:
+  mongo_data:
