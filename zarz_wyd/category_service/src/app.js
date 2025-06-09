@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 
 const app = express();
 
+app.set('trust proxy', 1);
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minut
   max: 100, // maksymalnie 100 żądań/IP
@@ -24,7 +25,7 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
-router.get('/check/health', (req, res) => res.sendStatus(200));
+app.get('/check/health', (req, res) => res.sendStatus(200));
 app.use('/api/category', categoryRoutes);
 app.use(errorHandler);
 

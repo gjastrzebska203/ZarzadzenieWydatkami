@@ -1,2 +1,2 @@
-CREATE DATABASE users_db;
+CREATE DATABASE user_db;
 CREATE DATABASE category_db;

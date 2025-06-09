@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifications-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notifications-service
+  template:
+    metadata:
+      labels:
+        app: notifications-service
+    spec:
+      containers:
+        - name: notifications
+          image: notifications-service:local
+          ports:
+            - containerPort: 4006
+          env:
+            - name: PORT
+              value: "4006"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: jwt
+
+            - name: MONGO_URI
+              value: "mongodb://mongo:27017/notifications_db"

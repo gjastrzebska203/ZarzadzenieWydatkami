@@ -2,6 +2,7 @@ services:
   user-service:
     build:
       context: ./user_service
+    image: user-service:local
     container_name: user-service
     ports:
       - "4000:4000"
@@ -11,7 +12,7 @@ services:
       - DB_HOST=postgres
       - DB_USER=postgres
       - DB_PASS=postgres
-      - DB_NAME=users_db
+      - DB_NAME=user_db
     depends_on:
       - postgres
     networks:
@@ -30,6 +31,7 @@ services:
     build:
       context: ./category_service
     container_name: category-service
+    image: category-service:local
     ports:
       - "4001:4001"
     environment:
@@ -54,6 +56,7 @@ services:
     build:
       context: ./budget_service
     container_name: budget-service
+    image: budget-service:local
     ports:
       - "4002:4002"
     environment:
@@ -80,6 +83,7 @@ services:
     build:
       context: ./expense_service
     container_name: expense-service
+    image: expense-service:local
     ports:
       - "4003:4003"
     environment:
@@ -106,6 +110,7 @@ services:
     build:
       context: ./investment_service
     container_name: investment-service
+    image: investment-service:local
     ports:
       - "4004:4004"
     environment:
@@ -130,6 +135,7 @@ services:
     build:
       context: ./report_service
     container_name: report-service
+    image: report-service:local
     ports:
       - "4005:4005"
     environment:
@@ -158,6 +164,7 @@ services:
     build:
       context: ./notifications_service
     container_name: notifications-service
+    image: notifications-service:local
     ports:
       - "4006:4006"
     environment:
@@ -182,6 +189,7 @@ services:
     build:
       context: ./account_service
     container_name: account-service
+    image: account-service:local
     ports:
       - "4007:4007"
     environment:

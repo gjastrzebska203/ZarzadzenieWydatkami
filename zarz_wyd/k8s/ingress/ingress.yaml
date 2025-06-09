@@ -1,0 +1,68 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microservices-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: local.test
+    http:
+      paths:
+      - path: /expense
+        pathType: Prefix
+        backend:
+          service:
+            name: expense-service
+            port:
+              number: 4003
+      - path: /investment
+        pathType: Prefix
+        backend:
+          service:
+            name: investment-service
+            port:
+              number: 4004
+      - path: /budget
+        pathType: Prefix
+        backend:
+          service:
+            name: budget-service
+            port:
+              number: 4002
+      - path: /account
+        pathType: Prefix
+        backend:
+          service:
+            name: account-service
+            port:
+              number: 4007
+      - path: /report
+        pathType: Prefix
+        backend:
+          service:
+            name: report-service
+            port:
+              number: 4005
+      - path: /notifications
+        pathType: Prefix
+        backend:
+          service:
+            name: notifications-service
+            port:
+              number: 4006
+      - path: /user
+        pathType: Prefix
+        backend:
+          service:
+            name: user-service
+            port:
+              number: 4000
+      - path: /category
+        pathType: Prefix
+        backend:
+          service:
+            name: category-service
+            port:
+              number: 4001
