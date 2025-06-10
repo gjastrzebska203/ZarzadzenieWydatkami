@@ -1,53 +1,25 @@
-# Etap 1: builder
+# builder
 FROM node:18-alpine AS builder
-WORKDIR /app
+# katalog roboczy w kontenerze na /app
+WORKDIR /app 
+# kopiuje pliki package.json i package-lock.json, instaluje wszystkie zależności 
 COPY package*.json ./
 RUN npm install
+# dodaje curl potrzebny do healthchecka.
 RUN apk add --no-cache curl
+# kopiuje cały kod aplikacji do /app
 COPY . .
 
-# Etap 2: produkcyjny
+# production
 FROM node:18-alpine
 WORKDIR /app
 RUN apk add --no-cache curl
+# kopiuje gotowy kod z poprzedniego etapu (już z npm install)
 COPY --from=builder /app .
+# usuwa zależności deweloperskie (devDependencies), pozostawia tylko to, co potrzebne do działania
 RUN npm prune --production
+# ustawia tryb produkcyjny
 ENV NODE_ENV=production
+# otwiera port 4000
 EXPOSE 4000
 CMD ["node", "src/index.js"]
-
-# Wersja 1:
-# # Budowanie
-# FROM node:18-alpine AS builder
-# WORKDIR /app
-# COPY package*.json ./
-# RUN apt-get update && apt-get install -y curl
-# RUN npm install
-# COPY . .
-
-# # Etap produkcyjny
-# FROM node:18-alpine
-# WORKDIR /app
-# COPY --from=builder /app .
-# RUN npm prune --production
-# ENV NODE_ENV=production
-# EXPOSE 4000
-# CMD ["node", "src/index.js"]
-
-# Wersja 2:
-# # Budowanie
-# FROM node:18-alpine AS builder
-# WORKDIR /app
-# COPY package*.json ./
-# RUN npm install
-# RUN apt-get update && apt-get install -y curl
-# COPY . .
-
-# # Etap produkcyjny
-# FROM node:18-alpine
-# WORKDIR /app
-# COPY --from=builder /app .
-# RUN npm prune --production
-# ENV NODE_ENV=production
-# EXPOSE 4000
-# CMD ["node", "src/index.js"]

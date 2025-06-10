@@ -15,14 +15,17 @@ const {
 } = require('../middlewares/validate.middleware');
 
 const router = express.Router();
-router.use(authenticate);
+// router.use(authenticate);
 
-router.post('/', validateCreateCategory, createCategory);
-router.post('/batch', getCategoriesByIds);
-router.get('/', getCategories);
+router.post('/', authenticate, validateCreateCategory, createCategory);
+router.post('/batch', authenticate, getCategoriesByIds);
+router.get('/', authenticate, getCategories);
 router.get('/all/categories', authorizeRole('admin'), getAllCategories);
-router.get('/:id', getCategoryById);
-router.put('/:id', validateUpdateCategory, updateCategory);
-router.delete('/:id', deleteCategory);
+router.get('/:id', authenticate, getCategoryById);
+router.put('/:id', authenticate, validateUpdateCategory, updateCategory);
+router.delete('/:id', authenticate, deleteCategory);
+router.get('/get/crash', (req, res, next) => {
+  throw new Error('Symulowany crash aplikacji');
+});
 
 module.exports = router;

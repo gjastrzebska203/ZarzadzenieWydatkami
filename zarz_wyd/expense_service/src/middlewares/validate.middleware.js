@@ -8,12 +8,10 @@ const validateCreateExpense = [
     .isString()
     .custom(async (val) => {
       try {
-        const response = await axios.get(
-          `${process.env.CATEGORY_SERVICE_URL}/api/categories/${val}`
-        );
+        const response = await axios.get(`${process.env.CATEGORY_SERVICE_URL}/api/category/${val}`);
         if (!response.data) throw new Error();
         return true;
-      } catch (err) {
+      } catch {
         throw new Error('Brak kategorii w bazie.');
       }
     })
@@ -26,7 +24,7 @@ const validateCreateExpense = [
         const response = await axios.get(`${process.env.BUDGET_SERVICE_URL}/api/budgets/${val}`);
         if (!response.data) throw new Error();
         return true;
-      } catch (err) {
+      } catch {
         throw new Error('Brak budżetu.');
       }
     }),
@@ -38,7 +36,7 @@ const validateCreateExpense = [
         const response = await axios.get(`${process.env.ACCOUNT_SERVICE_URL}/api/account/${val}`);
         if (!response.data) throw new Error();
         return true;
-      } catch (err) {
+      } catch {
         throw new Error('Brak rachunku.');
       }
     }),
@@ -56,12 +54,10 @@ const validateUpdateExpense = [
     .isString()
     .custom(async (val) => {
       try {
-        const response = await axios.get(
-          `${process.env.CATEGORY_SERVICE_URL}/api/categories/${val}`
-        );
+        const response = await axios.get(`${process.env.CATEGORY_SERVICE_URL}/api/category/${val}`);
         if (!response.data) throw new Error();
         return true;
-      } catch (err) {
+      } catch {
         throw new Error('Brak kategorii w bazie.');
       }
     })
@@ -74,7 +70,7 @@ const validateUpdateExpense = [
         const response = await axios.get(`${process.env.BUDGET_SERVICE_URL}/api/budgets/${val}`);
         if (!response.data) throw new Error();
         return true;
-      } catch (err) {
+      } catch {
         throw new Error('Brak budżetu.');
       }
     }),
@@ -86,7 +82,7 @@ const validateUpdateExpense = [
         const response = await axios.get(`${process.env.ACCOUNT_SERVICE_URL}/api/account/${val}`);
         if (!response.data) throw new Error();
         return true;
-      } catch (err) {
+      } catch {
         throw new Error('Brak rachunku.');
       }
     }),

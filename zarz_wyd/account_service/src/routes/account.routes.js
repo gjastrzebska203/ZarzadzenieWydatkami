@@ -17,15 +17,18 @@ const {
 const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
-router.use(authenticate);
+// router.use(authenticate);
 
-router.post('/', validateCreateAccount, createAccount);
-router.get('/', getAccounts);
+router.post('/', authenticate, validateCreateAccount, createAccount);
+router.get('/', authenticate, getAccounts);
 router.get('/all/accounts', authorizeRole('admin'), getAllAccounts);
-router.get('/:id', getAccount);
-router.get('/total/balance', getTotalBalance);
-router.put('/:id', validateUpdateAccount, updateAccount);
-router.delete('/:id', deleteAccount);
-router.post('/transfer', validateTransferFunds, transferFunds);
+router.get('/:id', authenticate, getAccount);
+router.get('/total/balance', authenticate, getTotalBalance);
+router.put('/:id', authenticate, validateUpdateAccount, updateAccount);
+router.delete('/:id', authenticate, deleteAccount);
+router.post('/transfer', authenticate, validateTransferFunds, transferFunds);
+router.get('/get/crash', (req, res, next) => {
+  throw new Error('Symulowany crash aplikacji');
+});
 
 module.exports = router;

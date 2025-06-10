@@ -170,7 +170,6 @@ const checkForUnusualExpenses = async (req, res, next) => {
 
     return res.status(200).json({ message: 'Sprawdzono nietypowe wydatki.' });
   } catch (err) {
-    console.error(err);
     const error = new Error('Błąd sprawdzania wydatków');
     error.details = err.message;
     return next(error);
@@ -180,7 +179,6 @@ const checkForUnusualExpenses = async (req, res, next) => {
 const updateExpense = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.error(errors);
     const error = new Error('Błąd walidacji');
     error.status = 400;
     error.details = errors.array();

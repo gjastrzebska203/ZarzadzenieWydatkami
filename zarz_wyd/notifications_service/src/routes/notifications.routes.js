@@ -15,14 +15,17 @@ const {
 const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
-router.use(authenticate);
+// router.use(authenticate);
 
-router.post('/', validateCreateNotification, createNotification);
-router.get('/', getNotifications);
+router.post('/', authenticate, validateCreateNotification, createNotification);
+router.get('/', authenticate, getNotifications);
 router.get('/all/notifications', authorizeRole('admin'), getAllNotifications);
-router.get('/:id', getNotificationById);
-router.get('/unread/count', getUnreadCount);
-router.put('/:id', validateUpdateNotification, updateNotification);
-router.delete('/:id', deleteNotification);
+router.get('/:id', authenticate, getNotificationById);
+router.get('/unread/count', authenticate, getUnreadCount);
+router.put('/:id', authenticate, validateUpdateNotification, updateNotification);
+router.delete('/:id', authenticate, deleteNotification);
+router.get('/get/crash', (req, res, next) => {
+  throw new Error('Symulowany crash aplikacji');
+});
 
 module.exports = router;

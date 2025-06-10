@@ -8,7 +8,7 @@ const validateCreateCategory = [
 
   body('parent_category_id')
     .optional()
-    .custom(async (val) => {
+    .custom(async (val, { req }) => {
       const category = await Category.findOne({
         where: { id: val, user_id: req.user.id },
       });

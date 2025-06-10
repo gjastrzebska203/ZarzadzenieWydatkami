@@ -111,7 +111,6 @@ const forgotPassword = async (req, res, next) => {
     user.reset_token = token;
     user.reset_token_expiry = expiry;
     await user.save();
-    // await sendResetEmail(user.email, token);
     res.status(200).json({ message: 'Rozpoczęto reset hasła', token: token });
   } catch (err) {
     const error = new Error('Błąd forgot password');
@@ -166,7 +165,6 @@ const getProfile = async (req, res, next) => {
     });
     res.status(200).json({ message: 'Znaleziono użytkownika', user });
   } catch (err) {
-    console.error(err);
     const error = new Error('Błąd pobierania użytkownika');
     error.details = err.message;
     next(error);
@@ -174,8 +172,14 @@ const getProfile = async (req, res, next) => {
 };
 
 const getUsers = async (req, res, next) => {
-  const { id, email, full_name, role, language, currency } = req.user;
-  res.status(200).json({ id, email, full_name, role, language, currency });
+  try {
+    const user = await User.find();
+    res.status(200).json({ message: 'Znaleziono użytkowników', user });
+  } catch (err) {
+    const error = new Error('Błąd pobierania użytkowników');
+    error.details = err.message;
+    next(error);
+  }
 };
 
 const updateProfile = async (req, res, next) => {
@@ -198,10 +202,10 @@ const updateProfile = async (req, res, next) => {
     }
 
     const { email, full_name, language, currency } = req.body;
-    req.user.email = email || req.user.email;
-    req.user.full_name = full_name || req.user.full_name;
-    req.user.language = language || req.user.language;
-    req.user.currency = currency || req.user.currency;
+    user.email = email || user.email;
+    user.full_name = full_name || user.full_name;
+    user.language = language || user.language;
+    user.currency = currency || user.currency;
     await user.save();
     res.status(200).json({ message: 'Zaktualizowano pomyślnie.', user });
   } catch (err) {

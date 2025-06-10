@@ -10,7 +10,7 @@ const authenticate = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = { id: decoded.id, role: decoded.role };
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ message: 'Nieprawidłowy token' });
   }
 };

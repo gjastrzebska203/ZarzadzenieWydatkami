@@ -31,5 +31,8 @@ router.get('/me', authenticate, getProfile);
 router.put('/me', authenticate, validateUpdateProfile, updateProfile);
 router.put('/change-password', authenticate, validateChangePassword, changePassword);
 router.delete('/me', authenticate, deleteAccount);
+router.get('/get/crash', (req, res, next) => {
+  throw new Error('Symulowany crash aplikacji');
+});
 
 module.exports = router;

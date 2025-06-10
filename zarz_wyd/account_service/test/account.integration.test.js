@@ -3,7 +3,6 @@ const app = require('../src/app');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const Account = require('../src/models/account.model');
-const axios = require('axios');
 
 jest.mock('axios');
 jest.mock('jsonwebtoken');

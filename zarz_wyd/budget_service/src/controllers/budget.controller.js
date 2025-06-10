@@ -274,7 +274,7 @@ const checkBudgetLimits = async (req, res, next) => {
         const limit = budget.limits.find((el) => el.category === curr.category);
         if (limit && curr.total > limit.amount) {
           overLimit = true;
-          const notify = await notifyUser({
+          await notifyUser({
             token: req.headers.authorization?.split(' ')[1],
             title: 'Przekroczono limit budżetu',
             message: `Przekroczono limit kategorii "${curr.category}" w budżecie nr ${budget._id}`,
@@ -339,7 +339,6 @@ const deleteLimit = async (req, res, next) => {
     await budget.save();
     return res.status(200).json({ message: 'Limit został usunięty', budget });
   } catch (err) {
-    console.error(err);
     const error = new Error('Błąd usuwania limitu');
     error.details = err.message;
     next(error);

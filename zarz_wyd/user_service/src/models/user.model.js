@@ -60,7 +60,7 @@ module.exports = (sequelize) => {
       },
     },
     {
-      tableName: 'users',
+      tableName: 'user',
       timestamps: false,
       indexes: [
         {

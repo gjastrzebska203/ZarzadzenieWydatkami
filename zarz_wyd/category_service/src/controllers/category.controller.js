@@ -26,6 +26,7 @@ const createCategory = async (req, res, next) => {
       error.status = 409;
       return next(error);
     }
+
     const category = await Category.create({
       id,
       user_id: req.user.id,
@@ -36,6 +37,7 @@ const createCategory = async (req, res, next) => {
       created_at: new Date(),
       updated_at: new Date(),
     });
+
     return res.status(201).json({ message: 'Utworzono kategorię.', category: category });
   } catch (err) {
     const error = new Error('Błąd tworzenia kategorii');

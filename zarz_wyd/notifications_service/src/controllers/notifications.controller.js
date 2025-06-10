@@ -20,7 +20,6 @@ const createNotification = async (req, res, next) => {
     });
     res.status(201).json({ message: 'Utworzono powiadomienie.', notification });
   } catch (err) {
-    console.error(err);
     const error = new Error('Błąd tworzenia powiadomienie');
     error.details = err.message;
     return next(error);

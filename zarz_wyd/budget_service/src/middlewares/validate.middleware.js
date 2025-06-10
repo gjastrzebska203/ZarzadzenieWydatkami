@@ -47,7 +47,19 @@ const validateCreateBudget = [
     .isIn(['monthly', 'weekly'])
     .withMessage('Dozwolone wartości to "monthly" lub "weekly"'),
   body('startDate').isDate().withMessage('Data początkowa musi być datą.'),
-  body('endDate').isDate().withMessage('Data końcowa musi być datą.'),
+  body('endDate')
+    .isDate()
+    .withMessage('Data końcowa musi być datą.')
+    .custom((value, { req }) => {
+      const start = new Date(req.body.startDate);
+      const end = new Date(value);
+
+      if (start >= end) {
+        throw new Error('Data końcowa musi być późniejsza niż data początkowa.');
+      }
+
+      return true;
+    }),
 ];
 
 const validateUpdateBudget = [
@@ -95,7 +107,20 @@ const validateUpdateBudget = [
     .isIn(['monthly', 'weekly'])
     .withMessage('Dozwolone wartości to "monthly" lub "weekly"'),
   body('startDate').optional().isDate().withMessage('Data początkowa musi być datą.'),
-  body('endDate').optional().isDate().withMessage('Data końcowa musi być datą.'),
+  body('endDate')
+    .optional()
+    .isDate()
+    .withMessage('Data końcowa musi być datą.')
+    .custom((value, { req }) => {
+      const start = new Date(req.body.startDate);
+      const end = new Date(value);
+
+      if (start >= end) {
+        throw new Error('Data końcowa musi być późniejsza niż data początkowa.');
+      }
+
+      return true;
+    }),
 ];
 
 const validateAddLimit = [

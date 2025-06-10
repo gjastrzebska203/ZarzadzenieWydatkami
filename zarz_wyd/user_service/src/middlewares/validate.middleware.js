@@ -3,7 +3,7 @@ const { currencyCodes, languageCodes } = require('../config/data');
 const { User } = require('../models');
 
 const validateRegister = [
-  body('id').isUUID().withMessage('Nieprawidłowe id.'),
+  body('id').optional().isUUID().withMessage('Nieprawidłowe id.'),
   body('email').isEmail().withMessage('Nieprawidłowy email.'),
 
   body('password')

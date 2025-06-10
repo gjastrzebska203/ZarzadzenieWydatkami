@@ -82,8 +82,6 @@ const getTotalBalance = async (req, res, next) => {
       },
     ]);
 
-    console.log('Wynik: ' + result);
-
     const total = result[0]?.totalBalance || 0;
     res.status(200).json({ totalBalance: total });
   } catch (err) {

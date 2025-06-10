@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 jest.mock('jsonwebtoken', () => ({
   sign: jest.fn(() => 'mocked-token'),
   verify: jest.fn(() => ({ id: 'f37553fe-77c2-4f51-a51f-03b6857b5683', role: 'user' })),

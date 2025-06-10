@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const accountSchema = new mongoose.Schema(
   {
@@ -13,13 +13,13 @@ const accountSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["cash", "card", "bank", "e-wallet"],
+      enum: ['cash', 'card', 'bank', 'e-wallet'],
       required: true,
       index: true,
     },
     currency: {
       type: String,
-      default: "PLN",
+      default: 'PLN',
     },
     balance: {
       type: Number,
@@ -33,7 +33,7 @@ const accountSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-module.exports = mongoose.model("Account", accountSchema);
+module.exports = mongoose.model('Account', accountSchema);

@@ -1,27 +1,27 @@
 services:
   user-service:
     build:
-      context: ./user_service
-    image: user-service:local
-    container_name: user-service
+      context: ./user_service # buduje obraz
+    image: user-service:local # nazwa obrazu
+    container_name: user-service # nazwa kontenera
     ports:
-      - "4000:4000"
-    environment:
+      - "4000:4000" # mapuje porty 4000 z wewnętrznego kontenera na komputer
+    environment: # zmienne środowiskowe
       - PORT=4000
       - JWT_SECRET=superbezpiecznytest123
       - DB_HOST=postgres
       - DB_USER=postgres
       - DB_PASS=postgres
       - DB_NAME=user_db
-    depends_on:
+    depends_on: # zależności
       - postgres
-    networks:
+    networks: # łączy się z siecią
       - app-network
-    volumes:
+    volumes: # mapuje kod źródłowy z Twojego komputera do kontenera
       - ./user_service:/app
-    env_file:
+    env_file: # wczytuje dodatkowe zmienne środowiskowe z pliku .env
       - ./user_service/.env
-    healthcheck:
+    healthcheck: # healthcheck co 30 sekund
       test: ["CMD", "curl", "-f", "http://localhost:4000/check/health"]
       interval: 30s
       timeout: 10s
@@ -193,7 +193,7 @@ services:
     ports:
       - "4007:4007"
     environment:
-      - PORT=4007.
+      - PORT=4007
       - MONGO_URI=mongodb://mongo:27017/account_db
     depends_on:
       - mongo
@@ -215,10 +215,10 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: postgres # ustawia użytkownika i hasło
     volumes:
-      - pg_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pg_data:/var/lib/postgresql/data # wolumen zapewnia trwałość danych
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # wrzuca skrypt SQL inicjalizujący bazy danych
     networks:
       - app-network
   mongo:
@@ -231,7 +231,7 @@ services:
 
 networks:
   app-network:
-    driver: bridge
+    driver: bridge # wszystkie serwisy mogą się komunikować po nazwie w jednej sieci
 
 volumes:
   pg_data:

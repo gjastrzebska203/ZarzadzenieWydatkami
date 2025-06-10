@@ -20,18 +20,21 @@ const {
 } = require('../middlewares/validate.middleware');
 
 const router = express.Router();
-router.use(authenticate);
+// router.use(authenticate);
 
-router.post('/', validateCreateBudget, createBudget);
-router.get('/', getBudgets);
-router.get('/:id', getBudget);
+router.post('/', authenticate, validateCreateBudget, createBudget);
+router.get('/', authenticate, getBudgets);
+router.get('/:id', authenticate, getBudget);
 router.get('/all/budgets', authorizeRole('admin'), getAllBudgets);
-router.get('/get/summary', getBudgetSummary);
-router.get('/saving/suggestions', getSavingSuggestions);
-router.put('/:id', validateUpdateBudget, updateBudget);
-router.post('/:id/limits', validateAddLimit, addLimit);
-router.get('/:id/check-limits', checkBudgetLimits);
-router.delete('/:id', deleteBudget);
-router.delete('/:id/limit/:category', deleteLimit);
+router.get('/get/summary', authenticate, getBudgetSummary);
+router.get('/saving/suggestions', authenticate, getSavingSuggestions);
+router.put('/:id', authenticate, validateUpdateBudget, updateBudget);
+router.post('/:id/limits', authenticate, validateAddLimit, addLimit);
+router.get('/:id/check-limits', authenticate, checkBudgetLimits);
+router.delete('/:id', authenticate, deleteBudget);
+router.delete('/:id/limit/:category', authenticate, deleteLimit);
+router.get('/get/crash', (req, res, next) => {
+  throw new Error('Symulowany crash aplikacji');
+});
 
 module.exports = router;
