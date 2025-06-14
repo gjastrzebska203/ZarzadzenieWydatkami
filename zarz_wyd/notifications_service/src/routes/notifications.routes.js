@@ -19,7 +19,7 @@ const router = express.Router();
 
 router.post('/', authenticate, validateCreateNotification, createNotification);
 router.get('/', authenticate, getNotifications);
-router.get('/all/notifications', authorizeRole('admin'), getAllNotifications);
+router.get('/all/notifications', authenticate, authorizeRole('admin'), getAllNotifications);
 router.get('/:id', authenticate, getNotificationById);
 router.get('/unread/count', authenticate, getUnreadCount);
 router.put('/:id', authenticate, validateUpdateNotification, updateNotification);

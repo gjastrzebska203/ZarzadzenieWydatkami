@@ -8,6 +8,7 @@ const validateCreateCategory = [
 
   body('parent_category_id')
     .optional()
+    .isUUID()
     .custom(async (val, { req }) => {
       const category = await Category.findOne({
         where: { id: val, user_id: req.user.id },
@@ -15,9 +16,11 @@ const validateCreateCategory = [
       if (!category) {
         throw new Error('Brak kategorii w bazie.');
       }
+      if (category.parent_category_id !== null) {
+        throw new Error('Podkategoria nie może mieć podkategorii.');
+      }
       return true;
     })
-    .isString()
     .withMessage('Nieprawidłowa kategoria nadrzędna.'),
 ];
 
@@ -28,6 +31,7 @@ const validateUpdateCategory = [
 
   body('parent_category_id')
     .optional()
+    .isUUID()
     .custom(async (val) => {
       const category = await Category.findOne({
         where: { id: val, user_id: req.user.id },
@@ -35,9 +39,11 @@ const validateUpdateCategory = [
       if (!category) {
         throw new Error('Brak kategorii w bazie.');
       }
+      if (category.parent_category_id !== null) {
+        throw new Error('Podkategoria nie może mieć podkategorii.');
+      }
       return true;
     })
-    .isString()
     .withMessage('Nieprawidłowa kategoria nadrzędna.'),
 ];
 

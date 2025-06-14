@@ -45,7 +45,7 @@ const registerUser = async (req, res, next) => {
   } catch (err) {
     const error = new Error('Błąd rejestracji');
     error.details = err.message;
-    next(error);
+    return next(error);
   }
 };
 
@@ -63,12 +63,12 @@ const loginUser = async (req, res, next) => {
     const user = await User.findOne({ where: { email } });
     if (!user) {
       const error = new Error('Nieprawidłowy email lub hasło');
-      next(error);
+      return next(error);
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       const error = new Error('Nieprawidłowy email lub hasło');
-      next(error);
+      return next(error);
     }
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: '5h',
@@ -86,7 +86,7 @@ const loginUser = async (req, res, next) => {
   } catch (err) {
     const error = new Error('Błąd logowania');
     error.details = err.message;
-    next(error);
+    return next(error);
   }
 };
 
@@ -104,7 +104,7 @@ const forgotPassword = async (req, res, next) => {
     const user = await User.findOne({ where: { email } });
     if (!user) {
       const error = new Error('Konto nie znalezione');
-      next(error);
+      return next(error);
     }
     const token = uuidv4();
     const expiry = new Date(Date.now() + 60 * 60 * 1000);
@@ -115,7 +115,7 @@ const forgotPassword = async (req, res, next) => {
   } catch (err) {
     const error = new Error('Błąd forgot password');
     error.details = err.message;
-    next(error);
+    return next(error);
   }
 };
 
@@ -141,7 +141,7 @@ const resetPassword = async (req, res, next) => {
     if (!user) {
       const error = new Error('Konto nie znalezione, nieprawidłowy lub wygasły token');
       error.details = err.message;
-      next(error);
+      return next(error);
     }
     const hashed = await bcrypt.hash(newPassword, 10);
     user.password = hashed;
@@ -152,7 +152,7 @@ const resetPassword = async (req, res, next) => {
   } catch (err) {
     const error = new Error('Błąd reset password');
     error.details = err.message;
-    next(error);
+    return next(error);
   }
 };
 
@@ -167,7 +167,7 @@ const getProfile = async (req, res, next) => {
   } catch (err) {
     const error = new Error('Błąd pobierania użytkownika');
     error.details = err.message;
-    next(error);
+    return next(error);
   }
 };
 
@@ -178,7 +178,7 @@ const getUsers = async (req, res, next) => {
   } catch (err) {
     const error = new Error('Błąd pobierania użytkowników');
     error.details = err.message;
-    next(error);
+    return next(error);
   }
 };
 
@@ -198,7 +198,7 @@ const updateProfile = async (req, res, next) => {
     if (!user) {
       const error = new Error('Nie znaleziono użytkownika');
       error.details = err.message;
-      next(error);
+      return next(error);
     }
 
     const { email, full_name, language, currency } = req.body;
@@ -211,7 +211,7 @@ const updateProfile = async (req, res, next) => {
   } catch (err) {
     const error = new Error('Błąd aktualizacji profilu');
     error.details = err.message;
-    next(error);
+    return next(error);
   }
 };
 
@@ -230,7 +230,7 @@ const changePassword = async (req, res, next) => {
     if (!isMatch) {
       const error = new Error('Nieprawidłowe obecne hasło');
       error.details = err.message;
-      next(error);
+      return next(error);
     }
     const hashed = await bcrypt.hash(newPassword, 10);
     req.user.password = hashed;
@@ -239,7 +239,7 @@ const changePassword = async (req, res, next) => {
   } catch (err) {
     const error = new Error('Błąd zmiany hasła');
     error.details = err.message;
-    next(error);
+    return next(error);
   }
 };
 
@@ -248,14 +248,14 @@ const deleteAccount = async (req, res, next) => {
     const user = await User.findOne({ where: { id: req.user.id } });
     if (!user) {
       const error = new Error('Brak użytkownika.');
-      next(error);
+      return next(error);
     }
     await user.destroy();
     res.status(200).json({ message: 'Konto zostało usunięte.' });
   } catch (err) {
     const error = new Error('Błąd usuwania konta');
     error.details = err.message;
-    next(error);
+    return next(error);
   }
 };
 

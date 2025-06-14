@@ -17,11 +17,10 @@ const {
 const { authenticate, authorizeRole } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
-// router.use(authenticate);
 
 router.post('/', authenticate, validateCreateAccount, createAccount);
 router.get('/', authenticate, getAccounts);
-router.get('/all/accounts', authorizeRole('admin'), getAllAccounts);
+router.get('/all/accounts', authenticate, authorizeRole('admin'), getAllAccounts);
 router.get('/:id', authenticate, getAccount);
 router.get('/total/balance', authenticate, getTotalBalance);
 router.put('/:id', authenticate, validateUpdateAccount, updateAccount);

@@ -19,7 +19,7 @@ const router = express.Router();
 
 router.post('/', authenticate, validateCreateInvestment, createInvestment);
 router.get('/', authenticate, getInvestments);
-router.get('/all/investments', authorizeRole('admin'), getAllInvestments);
+router.get('/all/investments', authenticate, authorizeRole('admin'), getAllInvestments);
 router.get('/:id', authenticate, getInvestment);
 router.get('/get/summary', authenticate, getInvestmentSummary);
 router.get('/:id/simulate', authenticate, investmentSimulation);

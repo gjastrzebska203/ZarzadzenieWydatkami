@@ -20,7 +20,7 @@ const router = express.Router();
 router.post('/', authenticate, validateCreateCategory, createCategory);
 router.post('/batch', authenticate, getCategoriesByIds);
 router.get('/', authenticate, getCategories);
-router.get('/all/categories', authorizeRole('admin'), getAllCategories);
+router.get('/all/categories', authenticate, authorizeRole('admin'), getAllCategories);
 router.get('/:id', authenticate, getCategoryById);
 router.put('/:id', authenticate, validateUpdateCategory, updateCategory);
 router.delete('/:id', authenticate, deleteCategory);

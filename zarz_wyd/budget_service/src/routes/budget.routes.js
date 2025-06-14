@@ -20,12 +20,11 @@ const {
 } = require('../middlewares/validate.middleware');
 
 const router = express.Router();
-// router.use(authenticate);
 
 router.post('/', authenticate, validateCreateBudget, createBudget);
 router.get('/', authenticate, getBudgets);
 router.get('/:id', authenticate, getBudget);
-router.get('/all/budgets', authorizeRole('admin'), getAllBudgets);
+router.get('/all/budgets', authenticate, authorizeRole('admin'), getAllBudgets);
 router.get('/get/summary', authenticate, getBudgetSummary);
 router.get('/saving/suggestions', authenticate, getSavingSuggestions);
 router.put('/:id', authenticate, validateUpdateBudget, updateBudget);

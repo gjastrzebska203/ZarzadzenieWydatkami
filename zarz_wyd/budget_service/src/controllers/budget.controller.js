@@ -298,29 +298,37 @@ const checkBudgetLimits = async (req, res, next) => {
 const addLimit = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = new Error('Błąd walidacji');
-    error.status = 400;
-    error.details = errors.array();
-    return next(error);
+    return next({
+      status: 400,
+      message: 'Błąd walidacji',
+      details: errors.array(),
+    });
   }
 
   try {
-    const budget = await Budget.findOne({
-      where: { _id: req.params.id, userId: req.user.id },
-    });
+    const { id } = req.params;
+    const budget = await Budget.findOne({ _id: id, userId: req.user.id });
+
     if (!budget) {
-      const error = new Error('Nie znaleziono budżetu.');
-      error.status = 400;
-      return next(error);
+      return next({
+        status: 404,
+        message: 'Nie znaleziono budżetu.',
+      });
     }
+
     const { limits } = req.body;
+
+    if (!Array.isArray(budget.limits)) budget.limits = [];
     budget.limits.push(...limits);
+
     await budget.save();
-    return res.status(200).json({ message: 'Dodano limit pomyślnie.', budget });
+    res.status(200).json({ message: 'Dodano limit pomyślnie.', budget });
   } catch (err) {
-    const error = new Error('Błąd dodawania limitów do budżetu');
-    error.details = err.message;
-    next(error);
+    return next({
+      status: 500,
+      message: 'Błąd dodawania limitów do budżetu',
+      details: err.message,
+    });
   }
 };
 

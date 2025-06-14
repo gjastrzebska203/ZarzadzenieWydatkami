@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.post('/', validateCreateReport, authenticate, createReport);
 router.get('/', authenticate, getReports);
-router.get('/all/reports', authorizeRole('admin'), getAllReports);
+router.get('/all/reports', authenticate, authorizeRole('admin'), getAllReports);
 router.get('/:id', authenticate, getReportById);
 router.get('/summary/yearly', authenticate, getYearlyReportSummary);
 router.delete('/:id', authenticate, deleteReport);

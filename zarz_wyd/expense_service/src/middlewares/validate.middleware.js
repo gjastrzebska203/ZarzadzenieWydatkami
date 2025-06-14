@@ -6,9 +6,13 @@ const validateCreateExpense = [
 
   body('categoryId')
     .isString()
-    .custom(async (val) => {
+    .custom(async (val, { req }) => {
       try {
-        const response = await axios.get(`${process.env.CATEGORY_SERVICE_URL}/api/category/${val}`);
+        const token = req.headers.authorization;
+        const response = await axios.get(
+          `${process.env.CATEGORY_SERVICE_URL}/api/category/${val}`,
+          { headers: { Authorization: token } }
+        );
         if (!response.data) throw new Error();
         return true;
       } catch {
@@ -19,9 +23,12 @@ const validateCreateExpense = [
 
   body('budgetId')
     .optional()
-    .custom(async (val) => {
+    .custom(async (val, { req }) => {
       try {
-        const response = await axios.get(`${process.env.BUDGET_SERVICE_URL}/api/budgets/${val}`);
+        const token = req.headers.authorization;
+        const response = await axios.get(`${process.env.BUDGET_SERVICE_URL}/api/budget/${val}`, {
+          headers: { Authorization: token },
+        });
         if (!response.data) throw new Error();
         return true;
       } catch {
@@ -31,9 +38,12 @@ const validateCreateExpense = [
 
   body('accountId')
     .optional()
-    .custom(async (val) => {
+    .custom(async (val, { req }) => {
       try {
-        const response = await axios.get(`${process.env.ACCOUNT_SERVICE_URL}/api/account/${val}`);
+        const token = req.headers.authorization;
+        const response = await axios.get(`${process.env.ACCOUNT_SERVICE_URL}/api/account/${val}`, {
+          headers: { Authorization: token },
+        });
         if (!response.data) throw new Error();
         return true;
       } catch {
@@ -51,10 +61,15 @@ const validateUpdateExpense = [
   body('amount').optional().isFloat({ min: 0.01 }).withMessage('Nieprawidłowa kwota.'),
 
   body('categoryId')
+    .optional()
     .isString()
-    .custom(async (val) => {
+    .custom(async (val, { req }) => {
       try {
-        const response = await axios.get(`${process.env.CATEGORY_SERVICE_URL}/api/category/${val}`);
+        const token = req.headers.authorization;
+        const response = await axios.get(
+          `${process.env.CATEGORY_SERVICE_URL}/api/category/${val}`,
+          { headers: { Authorization: token } }
+        );
         if (!response.data) throw new Error();
         return true;
       } catch {
@@ -65,9 +80,12 @@ const validateUpdateExpense = [
 
   body('budgetId')
     .optional()
-    .custom(async (val) => {
+    .custom(async (val, { req }) => {
       try {
-        const response = await axios.get(`${process.env.BUDGET_SERVICE_URL}/api/budgets/${val}`);
+        const token = req.headers.authorization;
+        const response = await axios.get(`${process.env.BUDGET_SERVICE_URL}/api/budgets/${val}`, {
+          headers: { Authorization: token },
+        });
         if (!response.data) throw new Error();
         return true;
       } catch {
@@ -77,9 +95,12 @@ const validateUpdateExpense = [
 
   body('accountId')
     .optional()
-    .custom(async (val) => {
+    .custom(async (val, { req }) => {
       try {
-        const response = await axios.get(`${process.env.ACCOUNT_SERVICE_URL}/api/account/${val}`);
+        const token = req.headers.authorization;
+        const response = await axios.get(`${process.env.ACCOUNT_SERVICE_URL}/api/account/${val}`, {
+          headers: { Authorization: token },
+        });
         if (!response.data) throw new Error();
         return true;
       } catch {

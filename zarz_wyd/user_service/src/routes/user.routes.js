@@ -26,7 +26,7 @@ router.post('/register', validateRegister, registerUser);
 router.post('/login', validateLogin, loginUser);
 router.post('/forgot-password', validateForgotPassword, forgotPassword);
 router.post('/reset-password', validateResetPassword, resetPassword);
-router.get('/', authenticate, authorizeRole('admin'), getUsers);
+router.get('/', authenticate, authenticate, authorizeRole('admin'), getUsers);
 router.get('/me', authenticate, getProfile);
 router.put('/me', authenticate, validateUpdateProfile, updateProfile);
 router.put('/change-password', authenticate, validateChangePassword, changePassword);

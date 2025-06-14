@@ -21,7 +21,7 @@ const router = express.Router();
 router.post('/', authenticate, validateCreateExpense, createExpense);
 router.get('/', authenticate, getExpenses);
 router.get('/:id', authenticate, getExpense);
-router.get('/all/expenses', authorizeRole('admin'), getAllExpenses);
+router.get('/all/expenses', authenticate, authorizeRole('admin'), getAllExpenses);
 router.get('/get/summary', authenticate, getExpenseSummary);
 router.get('/unusual/check', authenticate, checkForUnusualExpenses);
 router.put('/:id', authenticate, validateUpdateExpense, updateExpense);
